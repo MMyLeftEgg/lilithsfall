@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Criar Nova Aventura</h2>
+<div class="container mt-5">
+    
+    <form method="POST" action="{{ url_for('create_adventure') }}" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Título</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="requester" class="form-label">Solicitante</label>
+            <input type="text" class="form-control" id="requester" name="requester" required>
+        </div>
+        <div class="mb-3">
+            <label for="reward" class="form-label">Recompensa</label>
+            <input type="text" class="form-control" id="reward" name="reward" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="document" class="form-label">Anexar Documento (PDF, DOCX)</label>
+            <input type="file" class="form-control" id="document" name="document" accept=".pdf,.docx">
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Anexar Imagem (PNG, JPG)</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary">Criar Aventura</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Minhas Campanhas</h1>
-<p>Você ainda não criou nenhuma campanha. Comece uma nova aventura!</p>
-<a href="{{ url_for('add_character') }}">Criar Nova aventura</a>
+<div class="container mt-5">
+    <h2>Aventuras</h2>
+    <div class="row">
+        {% for adventure in adventures %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{{ url_for('static', filename=adventure.image) }}" class="card-img-top" alt="Imagem da Aventura">
+                <div class="card-body">
+                    <h5 class="card-title">{{ adventure.title }}</h5>
+                    <p class="card-text">Solicitante: {{ adventure.requester }}</p>
+                    <p class="card-text">Recompensa: {{ adventure.reward }}</p>
+                    <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="btn btn-primary">Ver Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

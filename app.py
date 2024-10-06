@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
     user = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=True)
 
 
     def set_password(self, password):
@@ -182,6 +182,71 @@ def register():
 
     return render_template('register.html')
 
+class Adventure(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    requester = db.Column(db.String(100), nullable=False)
+    reward = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    document = db.Column(db.String(255), nullable=True)  # Caminho do documento anexado
+    image = db.Column(db.String(255), nullable=True)     # Caminho da imagem anexada
+
+    def __repr__(self):
+        return f"<Adventure {self.title}>"
+    
+    # Configuração para o upload
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'docx'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Função para verificar extensão de arquivo
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/create_adventure', methods=['GET', 'POST'])
+@login_required
+def create_adventure():
+    if request.method == 'POST':
+        title = request.form['title']
+        requester = request.form['requester']
+        reward = request.form['reward']
+        description = request.form['description']
+
+        # Upload de documento e imagem
+        document = None
+        image = None
+        
+        if 'document' in request.files:
+            doc = request.files['document']
+            if doc and allowed_file(doc.filename):
+                document_filename = secure_filename(doc.filename)
+                doc.save(os.path.join(app.config['UPLOAD_FOLDER'], document_filename))
+                document = f'uploads/{document_filename}'
+        
+        if 'image' in request.files:
+            img = request.files['image']
+            if img and allowed_file(img.filename):
+                image_filename = secure_filename(img.filename)
+                img.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                image = f'uploads/{image_filename}'
+
+        # Criar nova aventura e salvar no banco de dados
+        new_adventure = Adventure(title=title, requester=requester, reward=reward,
+                                  description=description, document=document, image=image)
+        db.session.add(new_adventure)
+        db.session.commit()
+
+        flash('Aventura criada com sucesso!', 'success')
+        return redirect(url_for('campaigns'))
+
+    return render_template('create_adventure.html')
+
+@app.route('/adventure/<int:adventure_id>')
+def adventure_detail(adventure_id):
+    adventure = Adventure.query.get_or_404(adventure_id)
+    return render_template('adventure_detail.html', adventure=adventure)
+
+    
 # Modelo para campos editaveis
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -238,7 +303,9 @@ def characters():
 
 @app.route('/campaigns')
 def campaigns():
-    return render_template('campaigns.html')
+    adventures = Adventure.query.all()
+    return render_template('campaigns.html', adventures=adventures)
+
 
 @app.route('/archive')
 def archive():

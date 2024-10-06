@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ adventure.title }}</h2>
+    <p><strong>Solicitante:</strong> {{ adventure.requester }}</p>
+    <p><strong>Recompensa:</strong> {{ adventure.reward }}</p>
+    <p><strong>Descrição:</strong> {{ adventure.description }}</p>
+
+    {% if adventure.document %}
+    <p><strong>Documento:</strong> <a href="{{ url_for('static', filename=adventure.document) }}" target="_blank">Baixar Documento</a></p>
+    {% endif %}
+
+    {% if adventure.image %}
+    <p><strong>Imagem:</strong></p>
+    <img src="{{ url_for('static', filename=adventure.image) }}" alt="{{ adventure.title }}" style="max-width: 100%;">
+    {% endif %}
+</div>
+{% endblock %}
