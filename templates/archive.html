@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Bem vindo ao nosso acervo de documentos.</h1>
+<p>Aqui está disponibilizado todos os arquivos e conteudos necessarios para sua aventura!</p>
+<a href="{{ url_for('static', filename='arquivos/livro_do_jogador_V20.pdf') }}" target="_blank">Livro do jogador Vampire V20</a><br>
+<a href="{{ url_for('static', filename='arquivos/ficha_de_personagem_V20.pdf') }}" target="_blank">Ficha de personagem V20</a><br>
+<a href="{{ url_for('static', filename='arquivos/20o-aniversario-ficha-de-necromancia-.pdf') }}" target="_blank">Ficha de necromancia</a><br>
+<a href="{{ url_for('static', filename='arquivos/carnicais-vicio-fatal.pdf') }}" target="_blank">Carniçais Vicio fatal</a><br>
+<a href="{{ url_for('static', filename='arquivos/companheiro-do-narrador-.pdf') }}" target="_blank">Companheiro do narrador</a><br>
+<a href="{{ url_for('static', filename='arquivos/enciclopedia_vampirica.pdf') }}" target="_blank">Enciclopedia Vampirica</a><br>
+<a href="{{ url_for('static', filename='arquivos/escolhidos-de-caim-a-mao-negra.pdf') }}" target="_blank">Escolhidos de caim a mão negra</a><br>
+<a href="{{ url_for('static', filename='arquivos/feiticaria-setita.pdf') }}" target="_blank">Feitiçaria Setita</a><br>
+<a href="{{ url_for('static', filename='arquivos/gehenna.pdf') }}" target="_blank">Livro Gehenna</a><br>
+<a href="{{ url_for('static', filename='arquivos/guia-da-camarilla.pdf') }}" target="_blank">Guia da Camarilla</a><br>
+<a href="{{ url_for('static', filename='arquivos/guia-do-saba.pdf') }}" target="_blank">Guia do Saba</a><br>
+<a href="{{ url_for('static', filename='arquivos/manual-do-narrador.pdf') }}" target="_blank">Manual do narrador</a><br>
+<a href="{{ url_for('static', filename='arquivos/os-membros-mais-procurados.pdf') }}" target="_blank">Os membros mais procurados</a><br>
+<a href="{{ url_for('static', filename='arquivos/refugios-dos-amaldicoados.pdf') }}" target="_blank">Refugio dos amaldiçoados</a><br>
+
+
+<br>
+
+{% endblock %}

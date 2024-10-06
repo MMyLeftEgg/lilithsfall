@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <div class="text-section">
+        <h1>Hugo Van Baskerville</h1>
+        <ul>
+            <li>Clã: Gangrel </li>
+            <li>Pseudônimo: Barão</li>
+            <li>Mascara: Presidente da empresa Astra</li>
+            <li>Lider do Clã</li>
+            <li>Idade:1705 Anos</li>
+            <li>"Descendentes:"</li>
+            <p>Victor Van Baskerville- 1° Filho</p>
+            <p>Alice Le Baskerville - 2° Filho</p>
+            <p>Julius Van Baskerville - 3° Filho</p>
+            <li>Locais:Mansão </li>
+        </ul>
+    </div>
+</section>
+<a href="{{ url_for('add_character') }}">Criar Novo Personagem</a>
+{% endblock %}
