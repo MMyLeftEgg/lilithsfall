@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Editar Conteúdo do Site</h1>
+
+    <!-- Se o usuário estiver logado, mostrar campos editáveis -->
+    {% if current_user.is_authenticated %}
+        <form method="POST" action="{{ url_for('edit_content') }}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Título da Página</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ content.title }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required>{{ content.description }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Imagem do Banner</label><br>
+                <img src="{{ url_for('static', filename=content.image) }}" alt="Imagem atual" style="width: 200px;">
+                <input type="file" class="form-control" id="image" name="image">
+            </div>
+
+            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+        </form>
+    {% else %}
+        <!-- Mostrar conteúdo estático se o usuário não estiver logado -->
+        <h2>{{ content.title }}</h2>
+        <p>{{ content.description }}</p>
+        <img src="{{ url_for('static', filename=content.image) }}" alt="Banner" style="width: 100%;">
+    {% endif %}
+</div>
+{% endblock %}

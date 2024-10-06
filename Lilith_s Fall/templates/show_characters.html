@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Personagens Criados pela Comunidade</h1>
+<div class="container mt-5">
+
+    <!-- Formulário para atualizar os personagens -->
+    <form method="POST" action="{{ url_for('update_characters') }}">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Máscara</th>
+                    <th>Clã</th>
+                    <th>Linhagem</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for character in characters %}
+                <tr>
+                    <td>
+                        <input type="text" name="name_{{ character.id }}" value="{{ character.name }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <input type="text" name="mask_{{ character.id }}" value="{{ character.mask }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <input type="text" name="clan_{{ character.id }}" value="{{ character.clan }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <input type="text" name="bloodline_{{ character.id }}" value="{{ character.bloodline }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <!-- Usando textarea para descrição -->
+                        <textarea name="description_{{ character.id }}" class="form-control" rows="3" required>{{ character.description }}</textarea>
+                    </td>
+                    <td>
+                        <!-- Botão para deletar -->
+                        <form method="POST" action="{{ url_for('delete_character', id=character.id) }}" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success mt-3">Salvar Alterações</button>
+    </form>
+
+</div>
+<a href="{{ url_for('add_character') }}" class="btn btn-primary mt-4">Adicionar Novo Personagem</a>
+{% endblock %}
