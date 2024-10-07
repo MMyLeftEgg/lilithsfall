@@ -2,18 +2,61 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>{{ adventure.title }}</h2>
-    <p><strong>Solicitante:</strong> {{ adventure.requester }}</p>
-    <p><strong>Recompensa:</strong> {{ adventure.reward }}</p>
-    <p><strong>Descrição:</strong> {{ adventure.description }}</p>
+    <div class="row">
+        <!-- Coluna para os detalhes da aventura -->
+        <div class="col-md-8">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Título:</strong> {{ adventure.title }}</li>
+                <li class="list-group-item"><strong>Solicitante:</strong> {{ adventure.requester }}</li>
+                <li class="list-group-item"><strong>Recompensa:</strong> {{ adventure.reward }}</li>
+                <!-- Documento -->
+                {% if adventure.document %}
+                <li class="list-group-item">
+                    <strong>Documento:</strong> 
+                    <a href="{{ url_for('static', filename=adventure.document) }}" target="_blank">Baixar Documento</a>
+                </li>
+                {% endif %}
+            </ul>
 
-    {% if adventure.document %}
-    <p><strong>Documento:</strong> <a href="{{ url_for('static', filename=adventure.document) }}" target="_blank">Baixar Documento</a></p>
-    {% endif %}
+            <!-- Descrição -->
+            <div class="description mt-4">
+                <h5>Descrição</h5>
+                <p>{{ adventure.description }}</p>
+            </div>
 
-    {% if adventure.image %}
-    <p><strong>Imagem:</strong></p>
-    <img src="{{ url_for('static', filename=adventure.image) }}" alt="{{ adventure.title }}" style="max-width: 100%;">
-    {% endif %}
+            <!-- Exibir responsável pela aventura -->
+            {% if adventure.responsible_user %}
+            <div class="responsible mt-4">
+                <strong>Responsável:</strong> {{ adventure.responsible_user.user }}
+            </div>
+            {% endif %}
+
+            <!-- Botão de iniciar aventura (apenas se não houver responsável) -->
+            {% if not adventure.responsible_user %}
+            <form method="POST" action="{{ url_for('start_adventure', adventure_id=adventure.id) }}">
+                <button type="submit" class="btn btn-success mt-4">Iniciar Aventura</button>
+            </form>
+            {% endif %}
+
+            <!-- Exibir botões de editar e apagar apenas para o criador ou admin -->
+            {% if current_user.is_admin or adventure.creator_id == current_user.id %}
+            <div class="mt-4">
+                <a href="{{ url_for('edit_adventure', adventure_id=adventure.id) }}" class="btn btn-warning">Editar</a>
+                <form method="POST" action="{{ url_for('delete_adventure', adventure_id=adventure.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Apagar</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Coluna para a imagem -->
+        <div class="col-md-4">
+            {% if adventure.image %}
+                <img src="{{ url_for('static', filename=adventure.image) }}" class="img-fluid rounded" alt="Imagem da Aventura">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/default_adventure.jpg') }}" class="img-fluid rounded" alt="Imagem padrão">
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

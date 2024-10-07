@@ -53,20 +53,30 @@ def user_loader(user_id):
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Se o usuário já está autenticado, redirecione para a dashboard
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    # Se o método é POST, tentamos realizar o login
     if request.method == 'POST':
         user = request.form['user']
         password = request.form['password']
+        
+        # Busca o usuário pelo nome de usuário
         user = User.query.filter_by(user=user).first()
 
-        if user and user.check_password(password):  # Verifica se a senha corresponde ao hash
+        # Verifica se o usuário existe e se a senha está correta
+        if user and check_password_hash(user.password, password):  # Idealmente usando senha com hash
             login_user(user)
             flash('Login bem-sucedido!', 'success')
-            return redirect(url_for('dashboard'))
+
+            # Redireciona para a página pretendida ou dashboard
+            next_page = request.args.get('next')  # Obtém a próxima página se o login foi exigido
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Nome de usuário ou senha incorretos.', 'danger')
 
     return render_template('login.html')
-
 # Rota para dashboard (requer login)
 @app.route('/dashboard')
 @login_required
@@ -190,9 +200,15 @@ class Adventure(db.Model):
     description = db.Column(db.Text, nullable=False)
     document = db.Column(db.String(255), nullable=True)  # Caminho do documento anexado
     image = db.Column(db.String(255), nullable=True)     # Caminho da imagem anexada
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Criador da aventura
+    responsible_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Usuário responsável pela aventura
+
+    creator = db.relationship('User', foreign_keys=[creator_id])
+    responsible_user = db.relationship('User', foreign_keys=[responsible_user_id])
 
     def __repr__(self):
         return f"<Adventure {self.title}>"
+
     
     # Configuração para o upload
 UPLOAD_FOLDER = 'static/uploads'
@@ -211,28 +227,34 @@ def create_adventure():
         requester = request.form['requester']
         reward = request.form['reward']
         description = request.form['description']
-
-        # Upload de documento e imagem
         document = None
         image = None
-        
+
+        # Processamento de arquivos
         if 'document' in request.files:
-            doc = request.files['document']
-            if doc and allowed_file(doc.filename):
-                document_filename = secure_filename(doc.filename)
-                doc.save(os.path.join(app.config['UPLOAD_FOLDER'], document_filename))
+            document_file = request.files['document']
+            if document_file and allowed_file(document_file.filename):
+                document_filename = secure_filename(document_file.filename)
+                document_file.save(os.path.join(app.config['UPLOAD_FOLDER'], document_filename))
                 document = f'uploads/{document_filename}'
-        
+
         if 'image' in request.files:
-            img = request.files['image']
-            if img and allowed_file(img.filename):
-                image_filename = secure_filename(img.filename)
-                img.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+            image_file = request.files['image']
+            if image_file and allowed_file(image_file.filename):
+                image_filename = secure_filename(image_file.filename)
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
                 image = f'uploads/{image_filename}'
 
         # Criar nova aventura e salvar no banco de dados
-        new_adventure = Adventure(title=title, requester=requester, reward=reward,
-                                  description=description, document=document, image=image)
+        new_adventure = Adventure(
+            title=title,
+            requester=requester,
+            reward=reward,
+            description=description,
+            document=document,
+            image=image,
+            creator_id=current_user.id  # Define o criador da aventura como o usuário atual
+        )
         db.session.add(new_adventure)
         db.session.commit()
 
@@ -241,10 +263,58 @@ def create_adventure():
 
     return render_template('create_adventure.html')
 
+
 @app.route('/adventure/<int:adventure_id>')
+@login_required
 def adventure_detail(adventure_id):
     adventure = Adventure.query.get_or_404(adventure_id)
     return render_template('adventure_detail.html', adventure=adventure)
+
+@app.route('/start_adventure/<int:adventure_id>', methods=['POST'])
+@login_required
+def start_adventure(adventure_id):
+    adventure = Adventure.query.get_or_404(adventure_id)
+    adventure.responsible_user_id = current_user.id  # O usuário atual torna-se responsável
+    db.session.commit()
+    flash('Você é agora o responsável por essa aventura!', 'success')
+    return redirect(url_for('adventure_detail', adventure_id=adventure_id))
+
+@app.route('/edit_adventure/<int:adventure_id>', methods=['GET', 'POST'])
+@login_required
+def edit_adventure(adventure_id):
+    adventure = Adventure.query.get_or_404(adventure_id)
+    
+    # Verificar se o usuário atual é o criador ou um admin
+    if not (current_user.is_admin or adventure.creator_id == current_user.id):
+        abort(403)
+
+    if request.method == 'POST':
+        adventure.title = request.form['title']
+        adventure.requester = request.form['requester']
+        adventure.reward = request.form['reward']
+        adventure.description = request.form['description']
+
+        db.session.commit()
+        flash('Aventura atualizada com sucesso!', 'success')
+        return redirect(url_for('adventure_detail', adventure_id=adventure.id))
+
+    return render_template('edit_adventure.html', adventure=adventure)
+
+
+@app.route('/delete_adventure/<int:adventure_id>', methods=['POST'])
+@login_required
+def delete_adventure(adventure_id):
+    adventure = Adventure.query.get_or_404(adventure_id)
+
+    # Verificar se o usuário atual é o criador ou um admin
+    if not (current_user.is_admin or adventure.creator_id == current_user.id):
+        abort(403)
+
+    db.session.delete(adventure)
+    db.session.commit()
+    flash('Aventura apagada com sucesso!', 'success')
+    return redirect(url_for('campaigns'))
+
 
     
 # Modelo para campos editaveis
@@ -404,14 +474,6 @@ def delete_character(id):
 
     flash('Personagem deletado com sucesso.', 'success')
     return redirect(url_for('show_characters'))
-
-# Diretório onde as imagens serão salvas
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/edit_content', methods=['POST'])
 @login_required

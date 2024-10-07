@@ -2,20 +2,25 @@
 
 {% block content %}
 <div style="text-align: center;">
-    <h1>Aventuras</h1>
+    <h1>Aventuras disponiveis</h1>
     </div>
 <div class="container mt-5">
-    
     <div class="row">
         {% for adventure in adventures %}
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <img src="{{ url_for('static', filename=adventure.image) }}" class="card-img-top" alt="Imagem da Aventura">
-                <div class="card-body">
-                    <h5 class="card-title">{{ adventure.title }}</h5>
-                    <p class="card-text">Solicitante: {{ adventure.requester }}</p>
-                    <p class="card-text">Recompensa: {{ adventure.reward }}</p>
-                    <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="btn btn-primary">Ver Detalhes</a>
+        <div class="col-md-12 mb-4">
+            <div class="card horizontal-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{ url_for('static', filename=adventure.image) }}" class="img-fluid rounded-start" alt="Imagem da Aventura" style="height: 100%; width: 100%; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ adventure.title }}</h5>
+                            <p class="card-text"><strong>Solicitante:</strong> {{ adventure.requester }}</p>
+                            <p class="card-text"><strong>Recompensa:</strong> {{ adventure.reward }}</p>
+                            <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="btn btn-primary">Ver Detalhes</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
