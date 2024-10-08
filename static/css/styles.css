@@ -282,6 +282,8 @@ ul.list-group {
     /* Redimensionar imagem */
     .img-right {
         width: 250px;
+        height: 500px;
+
     }
     
     /* Navbar */
@@ -300,6 +302,7 @@ ul.list-group {
 @media (max-width: 480px) {
     .img-right {
         width: 200px;
+        height: 400px;
     }
 
     .sidebar {
@@ -332,6 +335,7 @@ ul.list-group {
 
     .img-aside {
         width: 100%;
+
         margin-left: 0;
     }
 }
