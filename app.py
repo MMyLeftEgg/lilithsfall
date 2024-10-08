@@ -72,7 +72,7 @@ def login():
 
             # Redireciona para a página pretendida ou dashboard
             next_page = request.args.get('next')  # Obtém a próxima página se o login foi exigido
-            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+            return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
             flash('Nome de usuário ou senha incorretos.', 'danger')
 
@@ -283,16 +283,33 @@ def start_adventure(adventure_id):
 @login_required
 def edit_adventure(adventure_id):
     adventure = Adventure.query.get_or_404(adventure_id)
-    
+
     # Verificar se o usuário atual é o criador ou um admin
     if not (current_user.is_admin or adventure.creator_id == current_user.id):
-        abort(403)
+        abort(403)  # Se não for admin ou criador, proíbe o acesso
 
     if request.method == 'POST':
+        # Atualiza os dados da aventura com os dados enviados no formulário
         adventure.title = request.form['title']
         adventure.requester = request.form['requester']
         adventure.reward = request.form['reward']
         adventure.description = request.form['description']
+
+        # Atualiza o arquivo de documento, se enviado
+        if 'document' in request.files:
+            document_file = request.files['document']
+            if document_file and allowed_file(document_file.filename):
+                document_filename = secure_filename(document_file.filename)
+                document_file.save(os.path.join(app.config['UPLOAD_FOLDER'], document_filename))
+                adventure.document = f'uploads/{document_filename}'
+
+        # Atualiza o arquivo de imagem, se enviado
+        if 'image' in request.files:
+            image_file = request.files['image']
+            if image_file and allowed_file(image_file.filename):
+                image_filename = secure_filename(image_file.filename)
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                adventure.image = f'uploads/{image_filename}'
 
         db.session.commit()
         flash('Aventura atualizada com sucesso!', 'success')
