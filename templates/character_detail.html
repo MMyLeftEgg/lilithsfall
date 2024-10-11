@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Coluna para os detalhes do personagem -->
+        <div class="col-md-8">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Nome:</strong> {{ character.name }}</li>
+                <li class="list-group-item"><strong>Raça:</strong> {{ character.race }}</li>
+            </ul>
+
+            <!-- Descrição -->
+            <div class="description mt-4">
+                <h5>Descrição</h5>
+                <p>{{ character.description }}</p>
+            </div>
+        </div>
+
+        <!-- Coluna para a imagem -->
+        <div class="col-md-4">
+            {% if character.image %}
+                <img src="{{ url_for('static', filename=character.image) }}" class="img-fluid rounded" alt="Imagem do Personagem">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/default_character.jpg') }}" class="img-fluid rounded" alt="Imagem padrão">
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

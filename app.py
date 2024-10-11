@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
     user = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=True)
 
 
     def set_password(self, password):
@@ -332,6 +332,60 @@ def delete_adventure(adventure_id):
     flash('Aventura apagada com sucesso!', 'success')
     return redirect(url_for('campaigns'))
 
+class ImportantCharacter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    clan = db.Column(db.String(100), nullable=False)
+    race = db.Column(db.String(50), nullable=False)  # Ex: 'vampire', 'human', 'demon', etc.
+    bloodline = db.Column(db.String)
+    description = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255), nullable=True)  # Caminho da imagem
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem
+
+@app.route('/create_character', methods=['GET', 'POST'])
+@login_required
+def create_character():
+    if request.method == 'POST':
+        name = request.form['name']
+        race = request.form['race']
+        bloodline = request.form['bloodline']
+        description = request.form['description']
+
+        # Processamento de imagem
+        image = None
+        if 'image' in request.files:
+            image_file = request.files['image']
+            if image_file and allowed_file(image_file.filename):
+                image_filename = secure_filename(image_file.filename)
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                image = f'uploads/{image_filename}'
+
+        # Criar novo personagem importante
+        new_character = ImportantCharacter(
+            name=name,
+            race=race,
+            bloodline=bloodline,
+            description=description,
+            image=image,
+            created_by=current_user.id
+        )
+
+        db.session.add(new_character)
+        db.session.commit()
+        flash('Personagem criado com sucesso!', 'success')
+        return redirect(url_for('show_characters_by_race', race=race))
+
+    return render_template('create_character.html')
+
+@app.route('/characters/<string:race>')
+def show_characters_by_race(race):
+    characters = ImportantCharacter.query.filter_by(race=race).all()
+    return render_template('show_characters_by_race.html', characters=characters, race=race)
+
+@app.route('/character/<int:character_id>')
+def character_detail(character_id):
+    character = ImportantCharacter.query.get_or_404(character_id)
+    return render_template('character_detail.html', character=character)
 
     
 # Modelo para campos editaveis

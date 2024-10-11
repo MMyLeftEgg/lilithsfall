@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Personagens - {{ race|capitalize }}</h2>
+    <div class="row">
+        {% for character in characters %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{{ url_for('static', filename=character.image) }}" class="card-img-top" alt="{{ character.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ character.name }}</h5>
+                    <p class="card-text">{{ character.description[:100] }}...</p>
+                    <a href="{{ url_for('character_detail', character_id=character.id) }}" class="btn btn-primary">Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Criar Personagem Importante</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Personagem</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3"></div>
+            <label for="clan" class="form-label">Clã:</label>
+            <select class="form-control" id="clan" name="clan" required>
+                <option value="assamitas">Assamitas</option>
+                <option value="brujah">Brujah</option>
+                <option value="gangrel">Gangrel</option>
+                <option value="giovanni">Giovanni</option>
+                <option value="lasombra">Lassombra</option>
+                <option value="malkavianos">Malkavianos</option>
+                <option value="nosferatu">Nosferatu</option>
+                <option value="ravnos">Ravnos</option>
+                <option value="seguidores de set">Seguidores de Set</option>
+                <option value="toreador">Toreador</option>
+                <option value="tzmisce">Tzimisce</option>
+                <option value="ventrue">Ventrue</option>
+                <option value="caitiff">Caitiff</option>
+                <option value="sangue-ralo">Sangue-ralo</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="race" class="form-label">Raça</label>
+            <select class="form-control" id="race" name="race" required>
+                <option value="vampire">Vampiro</option>
+                <option value="human">Humano</option>
+                <option value="demon">Demônio</option>
+                <!-- Adicione outras raças conforme necessário -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="bloodline" class="form-label">Geração:</label>
+            <select class="form-control" id="bloodline" name="bloodline" required>
+                <option value="1º Geração">1º Geração</option>
+                <option value="2º Geração">2º Geração</option>
+                <option value="3º Geração">3º Geração</option>
+                <option value="4º Geração">4º Geração</option>
+                <option value="5º Geração">5º Geração</option>
+                <option value="6º Geração">6º Geração</option>
+                <option value="7º Geração">7º Geração</option>
+                <option value="8º Geração">8º Geração</option>
+                <option value="9º Geração">9º Geração</option>
+                <option value="10º Geração">10º Geração</option>
+                <option value="11º Geração">11º Geração</option>
+                <option value="12º Geração">12º Geração</option>
+                <option value="13º Geração">13º Geração</option>
+                <option value="14º Geração">14º Geração</option>
+                <option value="15º Geração">15º Geração</option>
+                <option value="Sangue-Ralo">Sangue-Ralo</option>
+                <!-- Adicione outras raças conforme necessário -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagem do Personagem</label>
+            <input class="form-control" type="file" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Criar Personagem</button>
+    </form>
+</div>
+{% endblock %}
