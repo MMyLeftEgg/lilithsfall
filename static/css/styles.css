@@ -1,3 +1,4 @@
+/* Estilos globais */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,10 +6,26 @@ body {
     background-color: #f4f4f4;
 }
 
+main {
+    padding: 20px;
+    margin-bottom: 80px; /* Adiciona espaço inferior para evitar sobreposição com o footer */
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Navbar */
 header {
     display: flex;
     align-items: center;
-    background-color: black;
+    background: linear-gradient(to left, black, red);
     padding: 10px 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -18,10 +35,7 @@ nav {
     justify-content: space-between;
     width: 100%;
     align-items: center;
-}
-
-nav a.logo {
-    margin-left: auto;
+    flex-wrap: wrap; /* Permite a navbar se ajustar em telas pequenas */
 }
 
 .logo {
@@ -35,7 +49,7 @@ nav ul {
     padding: 12px;
     display: flex;
     justify-content: flex-end;
-    flex-grow: 1;
+    flex-wrap: wrap; /* Faz com que o menu quebre em múltiplas linhas se necessário */
 }
 
 nav ul li {
@@ -56,78 +70,22 @@ nav ul li a:hover {
     color: red;
 }
 
-header {
-    background: linear-gradient(to left, black, red);
-    padding: 20px 0;
-    box-shadow: 0 6px 8px rgba(0, 0, 0.1, 0.2);
-}
-
-nav ul {
+nav ul li ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-}
-
-nav ul li {
-    position: relative;
-    margin: 0 20px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 10px 20px;
-    transition: all 0.3s ease;
-    display: block;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-nav ul li a::after {
-    content: '';
-    display: block;
-    margin: 0 auto;
-    width: 0;
-    height: 3px;
-    background-color: red;
-    transition: width 0.3s;
-}
-
-nav ul li a:hover::after {
-    width: 100%;
-}
-
-nav ul li a:hover {
-    color: red;
-}
-
-nav ul li ul {
     display: none;
     position: absolute;
-    top: 40px;
-    left: 0;
     background-color: black;
-    padding: 10px 0;
-    list-style-type: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 }
 
 nav ul li:hover ul {
     display: block;
 }
 
-nav ul li ul li {
-    margin: 0;
-}
-
 nav ul li ul li a {
-    padding: 10px 15px;
-    width: 150px;
-    text-align: left;
-    color: white;
+    padding: 10px;
 }
 
 nav ul li ul li a:hover {
@@ -135,73 +93,7 @@ nav ul li ul li a:hover {
     color: black;
 }
 
-main {
-    padding: 20px;
-}
-
-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 10px;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
-
-.container {
-    display: flex;
-    padding: 20px;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 20%;
-    background-color: #333;
-    color: white;
-    padding: 20px;
-}
-
-.sidebar ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.sidebar ul li {
-    margin-bottom: 10px;
-}
-
-.sidebar ul li a {
-    color: white;
-    text-decoration: none;
-}
-
-/* Conteúdo principal */
-.main-content {
-    width: 80%;
-    padding-left: 20px;
-}
-
-/* Seção de texto e imagem */
-section {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-.img-right {
-    width: 300px;
-    margin-left: 10px;
-    order: 1;
-}
-
-.text-section {
-    flex: 1;
-    order: 0;
-}
-
-/* Destacar a área de login/logout */
+/* Destacar o nome do usuário e o botão de logout */
 .user-section {
     background-color: #f8f9fa;
     padding: 5px 15px;
@@ -218,124 +110,49 @@ section {
     font-size: 0.9rem;
 }
 
-/* Botões */
-.user-section .btn-outline-primary {
-    border-color: #007bff;
-    color: #007bff;
-}
-
-.user-section .btn-outline-primary:hover {
-    background-color: #007bff;
-    color: #ffffff;
-}
-
-.user-section .btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-}
-
-.user-section .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #ffffff;
-}
-
-.description {
-    margin-top: 20px;
-}
-
-ul.list-group {
-    list-style-type: none;
-    padding: 0;
-}
-
-.list-group-item {
-    font-size: 1.1rem;
-    padding: 10px;
-}
-
-.description p {
-    font-size: 1rem;
-    line-height: 1.6;
-    text-align: justify;
-}
-
-
-/* Responsividade */
-
-/* Para telas menores que 768px (tablets e celulares) */
+/* Ajustes para garantir responsividade */
 @media (max-width: 768px) {
-    /* Layout em coluna */
-    .container {
+    .logo {
+        height: 40px;
+    }
+
+    nav ul {
         flex-direction: column;
+        align-items: flex-start;
     }
 
-    .sidebar {
-        width: 100%;
-        margin-bottom: 20px;
+    nav ul li {
+        margin-right: 0;
+        margin-bottom: 10px;
     }
 
-    .main-content {
-        width: 100%;
+    nav ul li a {
+        font-size: 16px; /* Reduz o tamanho da fonte em telas menores */
+    }
+
+    nav ul li ul {
+        position: static; /* Ajusta o submenu em telas pequenas */
         padding-left: 20px;
     }
 
-    /* Redimensionar imagem */
-    .img-right {
-        width: 250px;
-        height: 500px;
-
-    }
-    
-    /* Navbar */
-    nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    nav ul li {
-        margin-bottom: 10px;
-        margin-right: 0;
+    .user-section {
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
     }
 }
 
-/* Para telas menores que 480px (smartphones) */
 @media (max-width: 480px) {
-    .img-right {
-        width: 200px;
-        height: 400px;
+    .logo {
+        height: 30px; /* Logo menor para telas menores */
     }
 
-    .sidebar {
-        width: 100%;
+    nav ul li a {
+        font-size: 14px; /* Reduz ainda mais o tamanho da fonte em telas muito pequenas */
     }
 
-    .main-content {
-        width: 100%;
-    }
-
-    /* Texto e imagem em blocos separados */
-    section {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .text-section {
-        margin-bottom: 20px;
-    }
-
-    /* Navbar totalmente responsiva */
-    nav ul {
-        flex-direction: column;
-    }
-
-    nav ul li {
-        margin-bottom: 15px;
-        margin-right: 0;
-    }
-
-    .img-aside {
-        width: 100%;
-
-        margin-left: 0;
+    /* Ajusta o footer para telas pequenas */
+    footer {
+        padding: 15px;
     }
 }
