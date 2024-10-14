@@ -8,7 +8,7 @@
             <h2>Sala do Mestre</h2>
 
             <!-- Formulário para Iniciar Aventura -->
-            <form method="POST" action="{{ url_for('start_adventure') }}">
+            <form method="POST" id="start-adventure-form" action="{{ url_for('start_adventure') }}">
                 <div class="mb-3">
                     <label for="adventure_id" class="form-label">Selecionar Aventura para Iniciar</label>
                     <select name="adventure_id" id="adventure_id" class="form-select" required>
@@ -22,12 +22,10 @@
             </form>
 
             <!-- Botão de Finalizar Aventura -->
-            <form method="POST" action="{{ url_for('finalize_adventure') }}" class="mt-4">
-                <button type="submit" class="btn btn-danger">Finalizar Aventura</button>
-            </form>
+            <button id="finalize-adventure-btn" class="btn btn-danger mt-4">Finalizar Aventura</button>
 
-            <!-- Formulário para Salvar Detalhes da Aventura Finalizada -->
-            <form method="POST" action="{{ url_for('save_final_adventure') }}" class="mt-4">
+            <!-- Formulário para Salvar Detalhes da Aventura Finalizada (escondido inicialmente) -->
+            <form method="POST" id="save-final-adventure-form" action="{{ url_for('save_final_adventure') }}" class="mt-4" style="display: none;">
                 <div class="mb-3">
                     <label for="title" class="form-label">Título da Aventura Finalizada</label>
                     <input type="text" name="title" id="title" class="form-control" required>
@@ -38,86 +36,124 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Salvar Aventura Finalizada</button>
             </form>
+
+            <!-- Submenu para Aventuras Finalizadas -->
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <h3>Aventuras Finalizadas</h3>
+                    {% if final_adventures %}
+                    <ul class="list-group mb-3">
+                        {% for adventure in final_adventures %}
+                        <li class="list-group-item">
+                            <strong>{{ adventure.title }}</strong>
+                            <p>{{ adventure.details }}</p>
+                            <small>Finalizado por: {{ adventure.finisher.user }}</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>Nenhuma aventura finalizada.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Área para playlists de música e efeitos sonoros -->
+        <div class="col-md-4">
+            <h4>Playlists</h4>
+
+            <!-- Playlist de músicas -->
+            <div class="playlist mt-3">
+                <h5>Playlist de Músicas</h5>
+                <ul id="music-list" class="list-group">
+                    <!-- As músicas adicionadas aparecerão aqui -->
+                    {% if music_playlist %}
+                    {% for music in music_playlist %}
+                    <li class="list-group-item">
+                        {{ music.name }}
+                        <audio controls>
+                            <source src="{{ url_for('static', filename=music.file_path) }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </li>
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+                <!-- Formulário para adicionar nova música -->
+                <form method="POST" action="{{ url_for('add_music') }}" enctype="multipart/form-data" class="mt-3">
+                    <input type="file" name="music_file" accept="audio/*" required>
+                    <button type="submit" class="btn btn-primary btn-sm">Adicionar Música</button>
+                </form>
+            </div>
+
+            <!-- Playlist de efeitos sonoros -->
+            <div class="playlist mt-5">
+                <h5>Playlist de Efeitos Sonoros</h5>
+                <ul id="sfx-list" class="list-group">
+                    <!-- Efeitos sonoros adicionados aparecerão aqui -->
+                    {% if sfx_playlist %}
+                    {% for sfx in sfx_playlist %}
+                    <li class="list-group-item">
+                        {{ sfx.name }}
+                        <audio controls>
+                            <source src="{{ url_for('static', filename=sfx.file_path) }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        {% if current_user.is_admin %}
+                        <!-- Botão para remover efeito sonoro (visível apenas para admins) -->
+                        <form method="POST" action="{{ url_for('delete_sfx', sfx_id=sfx.id) }}" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                        </form>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+                <!-- Formulário para adicionar novo efeito sonoro (disponível apenas para admins) -->
+                {% if current_user.is_admin %}
+                <form method="POST" action="{{ url_for('add_sfx') }}" enctype="multipart/form-data" class="mt-3">
+                    <input type="file" name="sfx_file" accept="audio/*" required>
+                    <button type="submit" class="btn btn-primary btn-sm">Adicionar Efeito Sonoro</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <!-- Submenu para Aventuras Finalizadas -->
+    <!-- Área para mapas -->
     <div class="row mt-5">
-        <div class="col-md-8">
-            <h3>Aventuras Finalizadas</h3>
-            {% if final_adventures %}
-            <ul class="list-group mb-3">
-                {% for adventure in final_adventures %}
-                <li class="list-group-item">
-                    <strong>{{ adventure.title }}</strong>
-                    <p>{{ adventure.details }}</p>
-                    <small>Finalizado por: {{ adventure.finisher.user }}</small>
-                </li>
+        <div class="col-md-12">
+            <h4>Mapas</h4>
+            <select id="map-selector" class="form-select">
+                <option value="" disabled selected>Escolha um mapa...</option>
+                {% for map in maps %}
+                <option value="{{ url_for('static', filename=map.file_path) }}">{{ map.name }}</option>
                 {% endfor %}
-            </ul>
-            {% else %}
-            <p>Nenhuma aventura finalizada.</p>
-            {% endif %}
-        </div>
-    </div>
-</div>
-    <!-- Playlist de Músicas -->
-    <div class="mt-4">
-        <h4>Playlist de Músicas</h4>
-        <ul id="musicPlaylist" class="list-group mb-3">
-            <!-- Lista dinâmica de músicas -->
-        </ul>
-        <input type="file" accept="audio/*" class="form-control mb-3" id="addMusicInput">
-        <button class="btn btn-secondary" id="addMusicBtn">Adicionar Música</button>
-    </div>
-
-    <!-- Playlist de Efeitos Sonoros -->
-    <div class="mt-4">
-        <h4>Playlist de Efeitos Sonoros</h4>
-        <ul id="sfxPlaylist" class="list-group mb-3">
-            <!-- Lista dinâmica de efeitos sonoros -->
-        </ul>
-        {% if current_user.is_admin %}
-        <input type="file" accept="audio/*" class="form-control mb-3" id="addSFXInput">
-        <button class="btn btn-secondary" id="addSFXBtn">Adicionar Efeito Sonoro</button>
-        {% endif %}
-    </div>
-
-    <!-- Seleção de Mapas -->
-    <div class="mt-4">
-        <h4>Mapas</h4>
-        <input type="file" accept="image/*" class="form-control mb-3" id="addMapInput">
-        <button class="btn btn-secondary" id="addMapBtn">Adicionar Mapa</button>
-        <div id="mapViewer" class="mt-4" style="display:none;">
-            <img id="selectedMap" class="img-fluid" alt="Mapa Selecionado">
+            </select>
+            <div id="map-display" class="mt-4">
+                <img id="map-image" src="" alt="Mapa Selecionado" class="img-fluid" style="display: none;">
+            </div>
         </div>
     </div>
 </div>
 
+<!-- JavaScript para interatividade -->
 <script>
-    // Manipulação de botões e elementos da Sala do Mestre
-    document.getElementById("startAdventureBtn").addEventListener("click", function() {
-        const selectedAdventure = document.getElementById("selectAdventure").value;
-        if (selectedAdventure === "new") {
-            window.location.href = "{{ url_for('create_adventure') }}";
-        } else if (selectedAdventure) {
-            // Redirecionar para detalhes da aventura escolhida
-            window.location.href = "/adventure/" + selectedAdventure;
-        }
+    // Mostrar campos para finalizar aventura ao clicar no botão
+    document.getElementById('finalize-adventure-btn').addEventListener('click', function () {
+        document.getElementById('save-final-adventure-form').style.display = 'block';
     });
 
-    document.getElementById("finishAdventureBtn").addEventListener("click", function() {
-        document.getElementById("finishedAdventureSection").style.display = "block";
-    });
-
-    document.getElementById("saveFinalAdventureBtn").addEventListener("click", function() {
-        const title = document.getElementById("finalAdventureTitle").value;
-        const details = document.getElementById("finalAdventureDetails").value;
-        if (title && details) {
-            // Realizar uma requisição para salvar a aventura finalizada
-            // Implementar em `app.py` para salvar no banco de dados
+    // Trocar imagem de mapa ao selecionar
+    document.getElementById('map-selector').addEventListener('change', function () {
+        const mapUrl = this.value;
+        const mapImage = document.getElementById('map-image');
+        if (mapUrl) {
+            mapImage.src = mapUrl;
+            mapImage.style.display = 'block';
+        } else {
+            mapImage.style.display = 'none';
         }
     });
 </script>
-
 {% endblock %}

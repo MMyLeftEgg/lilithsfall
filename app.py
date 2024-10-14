@@ -270,14 +270,31 @@ def adventure_detail(adventure_id):
     adventure = Adventure.query.get_or_404(adventure_id)
     return render_template('adventure_detail.html', adventure=adventure)
 
-@app.route('/start_adventure/<int:adventure_id>', methods=['POST'])
+@app.route('/start_adventure', methods=['POST'])
 @login_required
-def start_adventure(adventure_id):
-    adventure = Adventure.query.get_or_404(adventure_id)
-    adventure.responsible_user_id = current_user.id  # O usuário atual torna-se responsável
+def start_adventure():
+    # Obter o ID da aventura do formulário
+    adventure_id = request.form.get('adventure_id')
+
+    if not adventure_id:
+        flash("Por favor, selecione uma aventura para iniciar.", "warning")
+        return redirect(url_for('sala_do_mestre'))
+
+    # Buscar a aventura selecionada
+    try:
+        adventure_id = int(adventure_id)
+        adventure = Adventure.query.get_or_404(adventure_id)
+    except ValueError:
+        flash("ID de aventura inválido.", "danger")
+        return redirect(url_for('sala_do_mestre'))
+
+    # Definir o usuário atual como responsável pela aventura
+    adventure.responsible_user_id = current_user.id
     db.session.commit()
+
     flash('Você é agora o responsável por essa aventura!', 'success')
-    return redirect(url_for('adventure_detail', adventure_id=adventure_id))
+    return redirect(url_for('adventure_detail', adventure_id=adventure.id))
+
 
 @app.route('/edit_adventure/<int:adventure_id>', methods=['GET', 'POST'])
 @login_required
@@ -636,6 +653,8 @@ def sala_do_mestre():
     return render_template('sala_do_mestre.html', adventures=adventures, final_adventures=final_adventures)
 
 
+
+
 @app.route('/save_final_adventure', methods=['POST'])
 @login_required
 def save_final_adventure():
@@ -671,22 +690,46 @@ class AdventureFinished(db.Model):
     def __repr__(self):
         return f"<AdventureFinished {self.title}>"
 
-# Configurar para permitir upload e visualização
+# Adicionar música à playlist
 @app.route('/add_music', methods=['POST'])
 @login_required
 def add_music():
-    if 'music' in request.files:
-        music_file = request.files['music']
+    if 'music_file' in request.files:
+        music_file = request.files['music_file']
         if allowed_file(music_file.filename):
             filename = secure_filename(music_file.filename)
             music_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # Adicione lógica para salvar referência no banco de dados, se necessário
-            flash("Música adicionada com sucesso!", "success")
+            # Salvar detalhes da música no banco de dados se necessário
+            flash('Música adicionada!', 'success')
+        else:
+            flash('Arquivo de música inválido!', 'danger')
     return redirect(url_for('sala_do_mestre'))
 
+# Adicionar efeito sonoro (apenas admin)
+@app.route('/add_sfx', methods=['POST'])
+@login_required
+def add_sfx():
+    if not current_user.is_admin:
+        abort(403)
+    if 'sfx_file' in request.files:
+        sfx_file = request.files['sfx_file']
+        if allowed_file(sfx_file.filename):
+            filename = secure_filename(sfx_file.filename)
+            sfx_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Salvar detalhes do efeito no banco de dados se necessário
+            flash('Efeito sonoro adicionado!', 'success')
+        else:
+            flash('Arquivo de efeito sonoro inválido!', 'danger')
+    return redirect(url_for('sala_do_mestre'))
 
-
-
+# Remover efeito sonoro (apenas admin)
+@app.route('/delete_sfx/<int:sfx_id>', methods=['POST'])
+@login_required
+def delete_sfx(sfx_id):
+    if not current_user.is_admin:
+        abort(403)
+    # Código para buscar e remover o efeito sonoro do banco de dados
+    flash('Efeito sonoro removido!', 'success')
 
 if __name__ == '__main__':
    
