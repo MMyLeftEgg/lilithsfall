@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Editar Personagem</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Personagem</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ character.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="race" class="form-label">Raça</label>
+            <select class="form-control" id="race" name="race" required>
+                <option value="vampiro" {% if character.race == 'vampiro' %}selected{% endif %}>Vampiro</option>
+                <option value="humano" {% if character.race == 'humano' %}selected{% endif %}>Humano</option>
+                <option value="demonio" {% if character.race == 'demonio' %}selected{% endif %}>Demônio</option>
+                <option value="lobisomen" {% if character.race == 'lobisomen' %}selected{% endif %}>Lobisomen</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" id="description" name="description" rows="5">{{ character.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagem do Personagem</label>
+            <input class="form-control" type="file" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Atualizar Personagem</button>
+    </form>
+</div>
+{% endblock %}

@@ -18,18 +18,19 @@
                 {% endif %}
             </ul>
 
+             <!-- Exibir responsável pela aventura -->
+             {% if adventure.responsible_user %}
+             <div class="responsible mt-4">
+                 <strong>Responsável:</strong> {{ adventure.responsible_user.user }}
+             </div>
+             {% endif %}
+
             <!-- Descrição -->
             <div class="description mt-4">
                 <h5>Descrição</h5>
                 <p>{{ adventure.description }}</p>
             </div>
 
-            <!-- Exibir responsável pela aventura -->
-            {% if adventure.responsible_user %}
-            <div class="responsible mt-4">
-                <strong>Responsável:</strong> {{ adventure.responsible_user.user }}
-            </div>
-            {% endif %}
 
             <!-- Botão de iniciar aventura (apenas se não houver responsável) -->
             {% if not adventure.responsible_user %}

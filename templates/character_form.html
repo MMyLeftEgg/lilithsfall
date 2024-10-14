@@ -1,52 +1,91 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Criador de Personagens</h1>
-<form method="POST" action="/add_character">
-    <label for="name">Nome do Personagem:</label><br>
-    <input type="text" id="name" name="name"><br><br>
-    <label for="race">Raça:</label><br>
-    <select id="race" name="race">
-        <option value="vampire">Vampiro</option>
-        <option value="demon">Demonio</option>
-        <option value="celestials">Celestial</option>
-        <option value="werewolfs">Lobisomens</option>
-        <option value="humans">Humanos</option>
-    </select><br><br>
-    <label for="mask">Mascara:</label><br>
-    <input type="text" id="mask" name="mask"><br><br>
-    <label for="clan">Clã:</label><br>
-    <select id="clan" name="clan">
-        <option value="assamitas">Assamitas</option>
-        <option value="brujah">Brujah</option>
-        <option value="gangrel">Gangrel</option>
-        <option value="giovanni">Giovanni</option>
-        <option value="lasombra">Lassombra</option>
-        <option value="malkavianos">Malkavianos</option>
-        <option value="nosferatu">Nosferatu</option>
-        <option value="ravnos">Ravnos</option>
-        <option value="seguidores de set">Seguidores de Set</option>
-        <option value="toreador">Toreador</option>
-        <option value="tzmisce">Tzimisce</option>
-        <option value="ventrue">Ventrue</option>
-        <option value="caitiff">Caitiff</option>
-        <option value="sangue-ralo">Sangue-ralo</option>
-    </select><br><br>
-    <label for="bloodline">Geração:</label><br>
-    <select id="bloodline" name="bloodline">
-        <option value="decima">11°</option>
-        <option value="decimaprimeira">12°</option>
-        <option value="decimaterceira">13°</option>
-        <option value="decimaquarta">14°</option>
-        <option value="decimaquinta">15°</option>
-        <option value="sangue-ralo">Sangue-ralo</option>
-    </select><br><br>
-    <label for="description">Descrição:</label><br>
-    <textarea id="description" name="description" required></textarea><br><br>
-    <input type="submit" value="Adicionar Personagem">
-</form>
-<br>
-<br>
-<img src="{{ url_for('static', filename='img/vampire_character_add.jpeg') }}" alt="character_add" width="1880" height="200" style="margin-bottom: 20px;">
+<div class="container mt-5">
+    <h2>Criar Personagem</h2>
+    <form method="POST" action="/add_character">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Personagem</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <!-- Campo de Raça -->
+        <div class="mb-3">
+            <label for="race" class="form-label">Raça</label>
+            <select class="form-control" id="race" name="race" required onchange="toggleVampireFields()">
+                <option value="vampiro">Vampiro</option>
+                <option value="humano">Humano</option>
+                <option value="demonio">Demônio</option>
+                <option value="lobisomen">Lobisomen</option>
+                <option value="celestial">Celestial</option>
+                <!-- Adicione outras raças conforme necessário -->
+            </select>
+        </div>
+        <!-- Campos Clã e Geração - visíveis apenas para Vampiros -->
+        <div class="mb-3" id="clan-field" style="display:none;">
+            <label for="clan" class="form-label">Clã:</label>
+            <select class="form-control" id="clan" name="clan">
+                <option value="assamitas">Assamitas</option>
+                <option value="brujah">Brujah</option>
+                <option value="gangrel">Gangrel</option>
+                <option value="giovanni">Giovanni</option>
+                <option value="lasombra">Lassombra</option>
+                <option value="malkavianos">Malkavianos</option>
+                <option value="nosferatu">Nosferatu</option>
+                <option value="ravnos">Ravnos</option>
+                <option value="seguidores de set">Seguidores de Set</option>
+                <option value="toreador">Toreador</option>
+                <option value="tremere">Tremere</option>
+                <option value="tzmisce">Tzimisce</option>
+                <option value="ventrue">Ventrue</option>
+                <option value="caitiff">Caitiff</option>
+                <option value="sangue-ralo">Sangue-ralo</option>
+            </select>
+        </div>
+        <div class="mb-3" id="bloodline-field" style="display:none;">
+            <label for="bloodline" class="form-label">Geração:</label>
+            <select class="form-control" id="bloodline" name="bloodline">
+                <option value="10º Geração">10º Geração</option>
+                <option value="11º Geração">11º Geração</option>
+                <option value="12º Geração">12º Geração</option>
+                <option value="13º Geração">13º Geração</option>
+                <option value="14º Geração">14º Geração</option>
+                <option value="15º Geração">15º Geração</option>
+                <option value="sangue-ralo">Sangue-Ralo</option>
+            </select>
+        </div>
+        <!-- Campo de Descrição -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+        </div>
+        <!-- Campo de Imagem -->
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagem do Personagem</label>
+            <input class="form-control" type="file" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Criar Personagem</button>
+    </form>
+</div>
+
+<!-- JavaScript para controlar a visibilidade dos campos -->
+<script>
+    function toggleVampireFields() {
+        var race = document.getElementById("race").value;
+        var clanField = document.getElementById("clan-field");
+        var bloodlineField = document.getElementById("bloodline-field");
+
+        // Mostrar campos Clã e Geração apenas para Vampiros
+        if (race === "vampiro") {
+            clanField.style.display = "block";
+            bloodlineField.style.display = "block";
+        } else {
+            clanField.style.display = "none";
+            bloodlineField.style.display = "none";
+        }
+    }
+
+    // Executar ao carregar a página para garantir que a seleção inicial esteja correta
+    document.addEventListener("DOMContentLoaded", toggleVampireFields);
+</script>
 {% endblock %}
 

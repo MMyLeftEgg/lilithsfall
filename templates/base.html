@@ -20,11 +20,11 @@
                 <li><a href="{{ url_for('index') }}">Home</a></li>
                 <li><a href="{{ url_for('characters') }}">Personagens</a>
                     <ul>
-                        <li><a href="{{ url_for('vampires') }}">Vampiros</a></li>
-                        <li><a href="{{ url_for('demons') }}">Demônios</a></li>
-                        <li><a href="{{ url_for('celestials') }}">Celestiais</a></li>
-                        <li><a href="{{ url_for('hugo') }}">Lobisomens</a></li>
-                        <li><a href="{{ url_for('hugo') }}">Humanos</a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='vampiro') }}">Vampiros</a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='humano') }}">Humanos</a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='demonio') }}">Demônios</a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='lobisomen') }}">Lobisomens</a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='celestial') }}">celestiais</a></li>
                     </ul>
                 </li>
                 <li><a href="{{ url_for('campaigns') }}">Aventuras</a></li>

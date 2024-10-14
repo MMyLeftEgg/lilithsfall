@@ -335,8 +335,8 @@ def delete_adventure(adventure_id):
 class ImportantCharacter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    clan = db.Column(db.String(100), nullable=False)
     race = db.Column(db.String(50), nullable=False)  # Ex: 'vampire', 'human', 'demon', etc.
+    clan = db.Column(db.String(100), nullable=False)
     bloodline = db.Column(db.String)
     description = db.Column(db.Text, nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Caminho da imagem
@@ -348,6 +348,7 @@ def create_character():
     if request.method == 'POST':
         name = request.form['name']
         race = request.form['race']
+        clan = request.form['clan']
         bloodline = request.form['bloodline']
         description = request.form['description']
 
@@ -364,6 +365,7 @@ def create_character():
         new_character = ImportantCharacter(
             name=name,
             race=race,
+            clan=clan,
             bloodline=bloodline,
             description=description,
             image=image,
@@ -379,15 +381,66 @@ def create_character():
 
 @app.route('/characters/<string:race>')
 def show_characters_by_race(race):
+    # Filtrar personagens importantes pela raça
     characters = ImportantCharacter.query.filter_by(race=race).all()
     return render_template('show_characters_by_race.html', characters=characters, race=race)
 
-@app.route('/character/<int:character_id>')
+
+#@app.route('/character/<int:character_id>')
+#def character_detail(character_id):
+    character = ImportantCharacter.query.get_or_404(character_id)
+    return render_template('character_detail.html', character=character)
+
+@app.route('/edit_character/<int:character_id>', methods=['GET', 'POST'])
+@login_required
+def edit_character(character_id):
+    character = ImportantCharacter.query.get_or_404(character_id)
+
+    # Verificar se o usuário é o criador ou um admin
+    if not (current_user.is_admin or character.created_by == current_user.id):
+        abort(403)  # Proibir acesso se não for permitido
+
+    if request.method == 'POST':
+        # Atualizar detalhes do personagem
+        character.name = request.form['name']
+        character.race = request.form['race']
+        character.description = request.form['description']
+
+        # Atualizar imagem se uma nova foi enviada
+        if 'image' in request.files:
+            image_file = request.files['image']
+            if image_file and allowed_file(image_file.filename):
+                image_filename = secure_filename(image_file.filename)
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                character.image = f'uploads/{image_filename}'
+
+        db.session.commit()
+        flash('Personagem atualizado com sucesso!', 'success')
+        return redirect(url_for('character_detail', character_id=character.id))
+
+    return render_template('edit_character.html', character=character)
+
+# Definição correta para delete_character
+@app.route('/delete_character/<int:character_id>', methods=['POST'])
+@login_required
+def delete_character(character_id):
+    character = ImportantCharacter.query.get_or_404(character_id)
+
+    # Verificar se o usuário é o criador ou um admin
+    if not (current_user.is_admin or character.created_by == current_user.id):
+        abort(403)
+
+    db.session.delete(character)
+    db.session.commit()
+    flash('Personagem deletado com sucesso!', 'success')
+    return redirect(url_for('show_characters_by_race', race=character.race))
+
+# Certifique-se de que character_detail não esteja duplicado
+@app.route('/character_detail/<int:character_id>')
 def character_detail(character_id):
     character = ImportantCharacter.query.get_or_404(character_id)
     return render_template('character_detail.html', character=character)
 
-    
 # Modelo para campos editaveis
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -518,14 +571,11 @@ def add_character():
         name = request.form['name']
         description = request.form['description']
         race = request.form['race']
-        mask = request.form['mask']
         clan = request.form['clan']
         bloodline = request.form['bloodline']
 
-
-        
         # Cria um novo personagem
-        new_character = Character(name=name, description=description, race=race, mask=mask, clan=clan, bloodline=bloodline)
+        new_character = Character(name=name, description=description, race=race, clan=clan, bloodline=bloodline)
         
         # Adiciona ao banco de dados
         db.session.add(new_character)
@@ -535,9 +585,9 @@ def add_character():
     
     return render_template('character_form.html')
 
-@app.route('/delete_character/<int:id>', methods=['POST'])
+@app.route('/delete_charactershow/<int:id>', methods=['POST'])
 @login_required
-def delete_character(id):
+def delete_charactershow(id):
     character = Character.query.get_or_404(id)
 
     db.session.delete(character)
@@ -571,6 +621,70 @@ def edit_content():
 
     flash('Conteúdo atualizado com sucesso!', 'success')
     return redirect(url_for('edit_page'))  # Redireciona para a página de edição ou exibição
+
+@app.route('/sala_do_mestre')
+@login_required
+def sala_do_mestre():
+    adventures = Adventure.query.filter(
+        (Adventure.creator_id == current_user.id) |
+        (Adventure.responsible_user_id == current_user.id)
+    ).all()
+
+    # Buscar aventuras finalizadas
+    final_adventures = AdventureFinished.query.filter_by(finished_by=current_user.id).all()
+
+    return render_template('sala_do_mestre.html', adventures=adventures, final_adventures=final_adventures)
+
+
+@app.route('/save_final_adventure', methods=['POST'])
+@login_required
+def save_final_adventure():
+    title = request.form.get('title')
+    details = request.form.get('details')
+
+    # Verificar se os campos são válidos
+    if not title or not details:
+        flash('Preencha todos os campos antes de salvar a aventura finalizada.', 'danger')
+        return redirect(url_for('sala_do_mestre'))
+    
+    # Salvar a aventura finalizada no banco de dados
+    final_adventure = AdventureFinished(
+        title=title,
+        details=details,
+        finished_by=current_user.id
+    )
+    db.session.add(final_adventure)
+    db.session.commit()
+    
+    flash("Aventura finalizada e salva com sucesso!", "success")
+    return redirect(url_for('sala_do_mestre'))
+
+
+class AdventureFinished(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    details = db.Column(db.Text, nullable=False)
+    finished_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    finisher = db.relationship('User', foreign_keys=[finished_by])
+
+    def __repr__(self):
+        return f"<AdventureFinished {self.title}>"
+
+# Configurar para permitir upload e visualização
+@app.route('/add_music', methods=['POST'])
+@login_required
+def add_music():
+    if 'music' in request.files:
+        music_file = request.files['music']
+        if allowed_file(music_file.filename):
+            filename = secure_filename(music_file.filename)
+            music_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Adicione lógica para salvar referência no banco de dados, se necessário
+            flash("Música adicionada com sucesso!", "success")
+    return redirect(url_for('sala_do_mestre'))
+
+
 
 
 
