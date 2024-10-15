@@ -235,15 +235,17 @@ def create_adventure():
             document_file = request.files['document']
             if document_file and allowed_file(document_file.filename):
                 document_filename = secure_filename(document_file.filename)
-                document_file.save(os.path.join(app.config['UPLOAD_FOLDER'], document_filename))
-                document = f'uploads/{document_filename}'
+                document_path = os.path.join(app.config['UPLOAD_FOLDER'], 'documents', document_filename)
+                document_file.save(document_path)
+                document = f'uploads/documents/{document_filename}'
 
         if 'image' in request.files:
             image_file = request.files['image']
             if image_file and allowed_file(image_file.filename):
                 image_filename = secure_filename(image_file.filename)
-                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
-                image = f'uploads/{image_filename}'
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], 'images', image_filename)
+                image_file.save(image_path)
+                image = f'uploads/images/{image_filename}'
 
         # Criar nova aventura e salvar no banco de dados
         new_adventure = Adventure(
@@ -262,7 +264,6 @@ def create_adventure():
         return redirect(url_for('campaigns'))
 
     return render_template('create_adventure.html')
-
 
 @app.route('/adventure/<int:adventure_id>')
 @login_required
@@ -472,6 +473,7 @@ class Character(db.Model):
     race = db.Column(db.String(200))
     mask = db.Column(db.String(200))
     clan = db.Column(db.String(200))
+    level = db.Column(db.Integer)
     bloodline = db.Column(db.String(200))
     description = db.Column(db.String(200))
 
@@ -495,6 +497,7 @@ def update_characters():
         character.name = request.form.get(f'name_{character.id}')
         character.mask = request.form.get(f'mask_{character.id}')
         character.clan = request.form.get(f'clan_{character.id}')
+        character.level = request.form.get(f'level_{character.id}')
         character.bloodline = request.form.get(f'bloodline_{character.id}')
         character.description = request.form.get(f'description_{character.id}')
 
@@ -589,10 +592,11 @@ def add_character():
         description = request.form['description']
         race = request.form['race']
         clan = request.form['clan']
+        level = request.form['level']
         bloodline = request.form['bloodline']
 
         # Cria um novo personagem
-        new_character = Character(name=name, description=description, race=race, clan=clan, bloodline=bloodline)
+        new_character = Character(name=name, description=description, race=race, clan=clan, bloodline=bloodline, level=level)
         
         # Adiciona ao banco de dados
         db.session.add(new_character)
@@ -639,18 +643,20 @@ def edit_content():
     flash('Conteúdo atualizado com sucesso!', 'success')
     return redirect(url_for('edit_page'))  # Redireciona para a página de edição ou exibição
 
+
 @app.route('/sala_do_mestre')
 @login_required
 def sala_do_mestre():
-    adventures = Adventure.query.filter(
-        (Adventure.creator_id == current_user.id) |
-        (Adventure.responsible_user_id == current_user.id)
-    ).all()
+    adventures = Adventure.query.all()
+    music_playlist = Music.query.all()
+    sfx_playlist = SFX.query.all()
+    final_adventures = AdventureFinished.query.all()  # Se precisar exibir aventuras finalizadas
 
-    # Buscar aventuras finalizadas
-    final_adventures = AdventureFinished.query.filter_by(finished_by=current_user.id).all()
-
-    return render_template('sala_do_mestre.html', adventures=adventures, final_adventures=final_adventures)
+    return render_template('sala_do_mestre.html', 
+                           adventures=adventures,
+                           music_playlist=music_playlist,
+                           sfx_playlist=sfx_playlist,
+                           final_adventures=final_adventures)
 
 
 
@@ -690,46 +696,114 @@ class AdventureFinished(db.Model):
     def __repr__(self):
         return f"<AdventureFinished {self.title}>"
 
-# Adicionar música à playlist
+# Configuração para uploads
+UPLOAD_FOLDER_MUSIC = 'static/uploads/music'
+UPLOAD_FOLDER_SFX = 'static/uploads/sfx'
+ALLOWED_EXTENSIONS = {'mp3', 'wav', 'ogg'}
+app.config['UPLOAD_FOLDER_MUSIC'] = UPLOAD_FOLDER_MUSIC
+app.config['UPLOAD_FOLDER_SFX'] = UPLOAD_FOLDER_SFX
+
+# Função para verificar extensão de arquivo permitida
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Modelo para Música e Efeitos Sonoros
+class Music(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    file_path = db.Column(db.String(255), nullable=False)
+
+class SFX(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    file_path = db.Column(db.String(255), nullable=False)
+
+# Rota para adicionar música
 @app.route('/add_music', methods=['POST'])
 @login_required
 def add_music():
-    if 'music_file' in request.files:
-        music_file = request.files['music_file']
-        if allowed_file(music_file.filename):
-            filename = secure_filename(music_file.filename)
-            music_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # Salvar detalhes da música no banco de dados se necessário
-            flash('Música adicionada!', 'success')
-        else:
-            flash('Arquivo de música inválido!', 'danger')
+    if 'music_file' not in request.files:
+        flash('Nenhum arquivo enviado.', 'danger')
+        return redirect(url_for('sala_do_mestre'))
+
+    music_file = request.files['music_file']
+    if music_file and allowed_file(music_file.filename):
+        filename = secure_filename(music_file.filename)
+        music_path = os.path.join(app.config['UPLOAD_FOLDER_MUSIC'], filename)
+        music_file.save(music_path)
+
+        new_music = Music(title=filename, file_path=f'uploads/music/{filename}')
+        db.session.add(new_music)
+        db.session.commit()
+
+        flash('Música adicionada com sucesso!', 'success')
+    else:
+        flash('Formato de arquivo inválido.', 'danger')
+
     return redirect(url_for('sala_do_mestre'))
 
-# Adicionar efeito sonoro (apenas admin)
+# Rota para adicionar efeitos sonoros
 @app.route('/add_sfx', methods=['POST'])
 @login_required
 def add_sfx():
-    if not current_user.is_admin:
-        abort(403)
-    if 'sfx_file' in request.files:
-        sfx_file = request.files['sfx_file']
-        if allowed_file(sfx_file.filename):
-            filename = secure_filename(sfx_file.filename)
-            sfx_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # Salvar detalhes do efeito no banco de dados se necessário
-            flash('Efeito sonoro adicionado!', 'success')
-        else:
-            flash('Arquivo de efeito sonoro inválido!', 'danger')
+    if 'sfx_file' not in request.files:
+        flash('Nenhum arquivo enviado.', 'danger')
+        return redirect(url_for('sala_do_mestre'))
+
+    sfx_file = request.files['sfx_file']
+    if sfx_file and allowed_file(sfx_file.filename):
+        filename = secure_filename(sfx_file.filename)
+        sfx_path = os.path.join(app.config['UPLOAD_FOLDER_SFX'], filename)
+        sfx_file.save(sfx_path)
+
+        new_sfx = SFX(title=filename, file_path=f'uploads/sfx/{filename}')
+        db.session.add(new_sfx)
+        db.session.commit()
+
+        flash('Efeito sonoro adicionado com sucesso!', 'success')
+    else:
+        flash('Formato de arquivo inválido.', 'danger')
+
     return redirect(url_for('sala_do_mestre'))
 
-# Remover efeito sonoro (apenas admin)
+# Rota para deletar musica
+@app.route('/delete_music/<int:music_id>', methods=['POST'])
+@login_required
+def delete_music(music_id):
+    music = Music.query.get_or_404(music_id)
+    if not current_user.is_admin:
+        abort(403)
+
+    # Remover o arquivo do sistema de arquivos
+    music_path = os.path.join(app.root_path, 'static', music.file_path)
+    if os.path.exists(music_path):
+        os.remove(music_path)
+
+    db.session.delete(music)
+    db.session.commit()
+    flash('Musica removido com sucesso!', 'success')
+
+    return redirect(url_for('sala_do_mestre'))
+
+# Rota para deletar efeito sonoro
 @app.route('/delete_sfx/<int:sfx_id>', methods=['POST'])
 @login_required
 def delete_sfx(sfx_id):
+    sfx = SFX.query.get_or_404(sfx_id)
     if not current_user.is_admin:
         abort(403)
-    # Código para buscar e remover o efeito sonoro do banco de dados
-    flash('Efeito sonoro removido!', 'success')
+
+    # Remover o arquivo do sistema de arquivos
+    sfx_path = os.path.join(app.root_path, 'static', sfx.file_path)
+    if os.path.exists(sfx_path):
+        os.remove(sfx_path)
+
+    db.session.delete(sfx)
+    db.session.commit()
+    flash('Efeito sonoro removido com sucesso!', 'success')
+
+    return redirect(url_for('sala_do_mestre'))
+
 
 if __name__ == '__main__':
    
