@@ -212,9 +212,8 @@ class Adventure(db.Model):
     
     # Configuração para o upload
 UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'docx'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'docx', 'mp3', 'wav', 'ogg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 # Função para verificar extensão de arquivo
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -699,7 +698,6 @@ class AdventureFinished(db.Model):
 # Configuração para uploads
 UPLOAD_FOLDER_MUSIC = 'static/uploads/music'
 UPLOAD_FOLDER_SFX = 'static/uploads/sfx'
-ALLOWED_EXTENSIONS = {'mp3', 'wav', 'ogg'}
 app.config['UPLOAD_FOLDER_MUSIC'] = UPLOAD_FOLDER_MUSIC
 app.config['UPLOAD_FOLDER_SFX'] = UPLOAD_FOLDER_SFX
 
