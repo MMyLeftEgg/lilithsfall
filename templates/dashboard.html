@@ -19,6 +19,7 @@
             left: 0;
             background-color: #343a40;
             padding-top: 20px;
+            transition: width 0.3s ease;
         }
         .sidebar a {
             padding: 15px;
@@ -40,12 +41,14 @@
             padding: 20px;
             background-color: #fff;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
         .navbar {
             margin-left: 250px;
             background-color: #ffffff;
             border-bottom: 1px solid #e7e7e7;
             padding: 15px;
+            transition: margin-left 0.3s ease;
         }
         .navbar h3 {
             font-size: 24px;
@@ -62,9 +65,68 @@
         .section-title {
             margin-top: 20px;
         }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                overflow: hidden;
+                transition: width 0.3s ease;
+            }
+            .sidebar a {
+                text-align: center;
+                padding: 10px;
+            }
+            .sidebar a i {
+                margin: 0;
+            }
+            .sidebar h2 {
+                display: none;
+            }
+            .navbar {
+                margin-left: 60px;
+                transition: margin-left 0.3s ease;
+            }
+            .content {
+                margin-left: 60px;
+                transition: margin-left 0.3s ease;
+            }
+            .btn-logout {
+                margin-right: 0;
+            }
+        }
+        @media (max-width: 576px) {
+            .sidebar, .navbar {
+                display: none;
+            }
+            .content {
+                margin: 0;
+            }
+            .mobile-nav {
+                display: block;
+                padding: 10px;
+                background-color: #343a40;
+                color: white;
+            }
+            .mobile-nav a {
+                color: white;
+                text-decoration: none;
+                font-size: 18px;
+                display: block;
+            }
+            .mobile-nav a:hover {
+                color: #ccc;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Mobile Navigation for Small Screens -->
+    <div class="mobile-nav d-flex justify-content-between align-items-center d-md-none">
+        <span class="navbar-brand mb-0 h3">Painel de Controle</span>
+        <a href="javascript:void(0);" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </a>
+    </div>
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -78,7 +140,7 @@
     </div>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-light">
+    <nav class="navbar navbar-light d-none d-md-block">
         <div class="container-fluid">
             <h3 class="navbar-brand">Painel de Controle</h3>
             <form class="d-flex">
@@ -139,4 +201,18 @@
 
     <!-- Bootstrap JS and Font Awesome -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    <script>
+        // Função para abrir e fechar a sidebar em telas menores
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const navbar = document.querySelector('.navbar');
+            sidebar.style.width = sidebar.style.width === '250px' ? '60px' : '250px';
+            content.style.marginLeft = content.style.marginLeft === '250px' ? '60px' : '250px';
+            navbar.style.marginLeft = navbar.style.marginLeft === '250px' ? '60px' : '250px';
+        }
+    </script>
+</body>
+</html>
