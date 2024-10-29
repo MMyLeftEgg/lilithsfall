@@ -10,9 +10,9 @@
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>Máscara</th>
                     <th>Clã</th>
                     <th>Linhagem</th>
+                    <th>Nivel:</th>
                     <th>Descrição</th>
                 </tr>
             </thead>
@@ -23,13 +23,13 @@
                         <input type="text" name="name_{{ character.id }}" value="{{ character.name }}" class="form-control" required>
                     </td>
                     <td>
-                        <input type="text" name="mask_{{ character.id }}" value="{{ character.mask }}" class="form-control" required>
-                    </td>
-                    <td>
                         <input type="text" name="clan_{{ character.id }}" value="{{ character.clan }}" class="form-control" required>
                     </td>
                     <td>
                         <input type="text" name="bloodline_{{ character.id }}" value="{{ character.bloodline }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <input type="text" name="clan_{{ character.id }}" value="{{ character.level }}" class="form-control" required>
                     </td>
                     <td>
                         <!-- Usando textarea para descrição -->
