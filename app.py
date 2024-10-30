@@ -202,6 +202,7 @@ class Adventure(db.Model):
     image = db.Column(db.String(255), nullable=True)     # Caminho da imagem anexada
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Criador da aventura
     responsible_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Usuário responsável pela aventura
+    status = db.Column(db.String(100), nullable=False, default='Disponivel')
 
     creator = db.relationship('User', foreign_keys=[creator_id])
     responsible_user = db.relationship('User', foreign_keys=[responsible_user_id])
@@ -290,6 +291,7 @@ def start_adventure():
 
     # Definir o usuário atual como responsável pela aventura
     adventure.responsible_user_id = current_user.id
+    adventure.status = "Em andamento"
     db.session.commit()
 
     flash('Você é agora o responsável por essa aventura!', 'success')
@@ -402,11 +404,6 @@ def show_characters_by_race(race):
     characters = ImportantCharacter.query.filter_by(race=race).all()
     return render_template('show_characters_by_race.html', characters=characters, race=race)
 
-
-#@app.route('/character/<int:character_id>')
-#def character_detail(character_id):
-    character = ImportantCharacter.query.get_or_404(character_id)
-    return render_template('character_detail.html', character=character)
 
 @app.route('/edit_character/<int:character_id>', methods=['GET', 'POST'])
 @login_required

@@ -27,7 +27,14 @@
                         <li><a href="{{ url_for('show_characters_by_race', race='celestial') }}">celestiais</a></li>
                     </ul>
                 </li>
-                <li><a href="{{ url_for('campaigns') }}">Aventuras</a></li>
+                <li><a href="{{ url_for('campaigns') }}">Aventuras</a>
+                    <ul>
+                        <li><a href="{{ url_for('show_characters_by_race', race='demonio') }}">Aventuras disponiveis </a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='humano') }}">Aventuras em andamento</a></li>
+                        <li><a href="{{ url_for('show_characters_by_race', race='vampiro') }}">Aventuras Finalizadas.</a></li>
+                        
+                    </ul>
+                </li>
                 <li><a href="{{ url_for('rules') }}">Regras de Jogo</a></li>
                 <li><a href="{{ url_for('add_character') }}">Criador de Personagens</a></li>
                 <li><a href="{{ url_for('archive') }}">Arquivo</a></li>
