@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Coluna para os detalhes do personagem -->
+        <div class="col-md-8">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Nome:</strong> {{ clan.name }}</li>
+                <li class="list-group-item"><strong>Disciplinas:</strong> {{ clan.disciplines }}</li>
+            </ul>
+
+            <!-- Descrição preservando a formatação -->
+            <div class="description mt-4">
+                <h5>Descrição</h5>
+                <pre style="white-space: pre-wrap;">{{ clan.description }}</pre>
+            </div>
+
+            <!-- Botões de Editar e Deletar -->
+            {% if current_user.is_admin or character.created_by == current_user.id %}
+            <div class="mt-4">
+                <a href="{{ url_for('edit_clan', clan_id=clan.id) }}" class="btn btn-warning">Editar</a>
+                <form method="POST" action="{{ url_for('delete_clan', clan_id=clan.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Deletar</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Coluna para a imagem -->
+        <div class="col-md-4">
+            {% if clan.image %}
+                <img src="{{ url_for('static', filename=clan.image) }}" class="img-fluid rounded" alt="Imagem do Clã">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/default_clan.jpg') }}" class="img-fluid rounded" alt="Imagem padrão">
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

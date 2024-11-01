@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Editar Clã</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Clã</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ clan.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Disciplinas</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ clan.disciplines }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" id="description" name="description" rows="5">{{ clan.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagem do Clã</label>
+            <input class="form-control" type="file" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Atualizar Clã</button>
+    </form>
+</div>
+{% endblock %}

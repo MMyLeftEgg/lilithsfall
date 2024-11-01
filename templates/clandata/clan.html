@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h1>Os Clãs</h1>
+    </div>
+<div class="container mt-5">
+    <div class="row">
+        {% for clan in clan %}
+        <div class="col-md-12 mb-4">
+            <div class="card horizontal-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{ url_for('static', filename=clan.image) }}" class="img-fluid rounded-start" alt="Imagem do clã" style="height: 100%; width: 100%; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ clan.name }}</h5>
+                            <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="btn btn-primary">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

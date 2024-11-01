@@ -525,9 +525,100 @@ def archive():
 def rules():
     return render_template('rules.html')
 
+class Clan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    disciplines = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255), nullable=True)  # Caminho da imagem.
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem.
+
+@app.route('/create_clan', methods=['GET', 'POST'])
+@login_required
+def create_clan():
+    if request.method == 'POST':
+        name = request.form['name']
+        disciplines = request.form['disciplines']
+        description = request.form['description']
+
+        # Processamento de imagem
+        image = None
+        if 'image' in request.files:
+            image_file = request.files['image']
+            if image_file and allowed_file(image_file.filename):
+                image_filename = secure_filename(image_file.filename)
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                image = f'uploads/{image_filename}'
+
+        # Criar novo personagem importante
+        new_clan = Clan(
+            name=name,
+            disciplines=disciplines,
+            description=description,
+            image=image,
+            created_by=current_user.id
+        )
+
+        db.session.add(new_clan)
+        db.session.commit()
+        flash('Clã criado com sucesso!', 'success')
+        return redirect(url_for('clan'))
+
+    return render_template('clandata/create_clan.html')
+
+@app.route('/edit_clan/<int:clan_id>', methods=['GET', 'POST'])
+@login_required
+def edit_clan(clan_id):
+    clan = Clan.query.get_or_404(clan_id)
+
+    # Verificar se o usuário é o criador ou um admin
+    if not (current_user.is_admin or clan.created_by == current_user.id):
+        abort(403)  # Proibir acesso se não for permitido
+
+    if request.method == 'POST':
+        # Atualizar detalhes do personagem
+        clan.name = request.form['name']
+        clan.disciplines = request.form['disciplines']
+        clan.description = request.form['description']
+
+        # Atualizar imagem se uma nova foi enviada
+        if 'image' in request.files:
+            image_file = request.files['image']
+            if image_file and allowed_file(image_file.filename):
+                image_filename = secure_filename(image_file.filename)
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                clan.image = f'uploads/{image_filename}'
+
+        db.session.commit()
+        flash('Clã atualizado com sucesso!', 'success')
+        return redirect(url_for('clan_detail', clan_id=clan.id))
+
+    return render_template('clandata/edit_clan.html', clan=clan)
+
+# Definição correta para delete_character
+@app.route('/delete_clan/<int:clan_id>', methods=['POST'])
+@login_required
+def delete_clan(clan_id):
+    clan = Clan.query.get_or_404(clan_id)
+
+    # Verificar se o usuário é o criador ou um admin
+    if not (current_user.is_admin or clan.created_by == current_user.id):
+        abort(403)
+
+    db.session.delete(clan)
+    db.session.commit()
+    flash('Clã deletado com sucesso!', 'success')
+    return redirect(url_for('clan'))
+
+# Certifique-se de que character_detail não esteja duplicado
+@app.route('/clan_detail/<int:clan_id>')
+def clan_detail(clan_id):
+    clan = Clan.query.get_or_404(clan_id)
+    return render_template('clandata/clan_detail.html', clan=clan)
+
 @app.route('/clan')
 def clan():
-    return render_template('clan.html')
+    return render_template('clandata/clan.html')
 
 @app.route('/disciplines')
 def disciplines():
@@ -576,9 +667,9 @@ def assamitas():
 def cainitamyth():
     return render_template('masters_info/cainitamyth.html')
 
-@app.route('/leo')
-def leo():
-    return render_template('charactersdata/humans/leo.html')
+@app.route('/saba')
+def saba():
+    return render_template('clandata/saba.html')
 
 
 @app.route('/add_character', methods=['GET', 'POST'])

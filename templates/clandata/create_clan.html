@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Criar um Clã</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Clã</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Disciplinas</label>
+            <input type="text" class="form-control" id="disciplines" name="disciplines" required>
+        </div>
+        <!-- Campo de Descrição -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+        </div>
+        <!-- Campo de Imagem -->
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagem do Personagem</label>
+            <input class="form-control" type="file" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Criar clã</button>
+    </form>
+</div>
+{% endblock %}
+

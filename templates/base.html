@@ -35,7 +35,15 @@
                         
                     </ul>
                 </li>
-                <li><a href="{{ url_for('rules') }}">Regras de Jogo</a></li>
+                <li><a href="{{ url_for('rules') }}">Conteúdo</a>
+                    <ul>
+                        <li><a href="{{ url_for('saba') }}">Sabá </a></li>
+                        <li><a href="{{ url_for('camarilla') }}">Camarilla</a></li>
+                        <li><a href="{{ url_for('clan') }}">Os Clãs</a></li>
+                        <li><a href="{{ url_for('gear') }}">Reliquias</a></li>
+                        
+                    </ul>
+                </li>
                 <li><a href="{{ url_for('add_character') }}">Criador de Personagens</a></li>
                 <li><a href="{{ url_for('archive') }}">Arquivo</a></li>
             </ul>
