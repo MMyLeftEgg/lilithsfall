@@ -530,8 +530,9 @@ class Clan(db.Model):
     name = db.Column(db.String(100), nullable=False)
     disciplines = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
+    slogan = db.Column(db.Text, nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Caminho da imagem.
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem.
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do 
 
 @app.route('/create_clan', methods=['GET', 'POST'])
 @login_required
@@ -539,6 +540,7 @@ def create_clan():
     if request.method == 'POST':
         name = request.form['name']
         disciplines = request.form['disciplines']
+        slogan = request.form['slogan']
         description = request.form['description']
 
         # Processamento de imagem
@@ -555,6 +557,7 @@ def create_clan():
             name=name,
             disciplines=disciplines,
             description=description,
+            slogan=slogan,
             image=image,
             created_by=current_user.id
         )
@@ -579,6 +582,7 @@ def edit_clan(clan_id):
         # Atualizar detalhes do personagem
         clan.name = request.form['name']
         clan.disciplines = request.form['disciplines']
+        clan.slogan = request.form['slogan']
         clan.description = request.form['description']
 
         # Atualizar imagem se uma nova foi enviada
@@ -618,7 +622,8 @@ def clan_detail(clan_id):
 
 @app.route('/clan')
 def clan():
-    return render_template('clandata/clan.html')
+    clans = Clan.query.all()
+    return render_template('clandata/clan.html', clans=clans)
 
 @app.route('/disciplines')
 def disciplines():

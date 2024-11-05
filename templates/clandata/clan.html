@@ -6,17 +6,19 @@
     </div>
 <div class="container mt-5">
     <div class="row">
-        {% for clan in clan %}
+        {% for clan in clans %}
         <div class="col-md-12 mb-4">
             <div class="card horizontal-card">
                 <div class="row g-0">
                     <div class="col-md-4">
-                        <img src="{{ url_for('static', filename=clan.image) }}" class="img-fluid rounded-start" alt="Imagem do clã" style="height: 100%; width: 100%; object-fit: cover;">
+                        <img src="{{ url_for('static', filename=clan.image) }}" class="img-fluid rounded-start" alt="Imagem do cla" style="height: 300px; width: 400px; object-fit: cover;">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
                             <h5 class="card-title">{{ clan.name }}</h5>
-                            <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="btn btn-primary">Ver Detalhes</a>
+                            <p class="card-text"><strong>Disciplinas:</strong> {{ clan.disciplines }}</p>
+                            <p class="card-text"><strong>Slogan:</strong> {{ clan.slogan }}</p>
+                            <a href="{{ url_for('clan_detail', clan_id=clan.id) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
                     </div>
                 </div>
