@@ -41,6 +41,7 @@
             {% endif %}
 
             <!-- Exibir botões de editar e apagar apenas para o criador ou admin -->
+         
             {% if current_user.is_admin or adventure.creator_id == current_user.id %}
             <div class="mt-4">
                 <a href="{{ url_for('edit_adventure', adventure_id=adventure.id) }}" class="btn btn-warning">Editar</a>

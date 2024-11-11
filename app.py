@@ -271,6 +271,13 @@ def adventure_detail(adventure_id):
     adventure = Adventure.query.get_or_404(adventure_id)
     return render_template('adventure_detail.html', adventure=adventure)
 
+# Rota para exibir aventuras por status
+@app.route('/adventures/<string:status>')
+@login_required
+def show_adventures(status):
+    adventures = Adventure.query.filter_by(status=status).all()
+    return render_template('show_adventures.html', adventures=adventures, status=status)
+
 @app.route('/start_adventure', methods=['POST'])
 @login_required
 def start_adventure():
@@ -755,22 +762,26 @@ def sala_do_mestre():
 
 @app.route('/save_final_adventure', methods=['POST'])
 @login_required
-def save_final_adventure():
-    title = request.form.get('title')
-    details = request.form.get('details')
+def save_final_adventure(status):
+    # Obter o ID da aventura do formulário
+    adventure_id = request.form.get('adventure_id')
 
-    # Verificar se os campos são válidos
-    if not title or not details:
-        flash('Preencha todos os campos antes de salvar a aventura finalizada.', 'danger')
+    if not adventure_id:
+        flash("Por favor, selecione uma aventura para Finalizar.", "warning")
         return redirect(url_for('sala_do_mestre'))
-    
-    # Salvar a aventura finalizada no banco de dados
-    final_adventure = AdventureFinished(
-        title=title,
-        details=details,
-        finished_by=current_user.id
-    )
-    db.session.add(final_adventure)
+
+    # Buscar a aventura selecionada
+    try:
+        adventure_id = int(adventure_id)
+        adventure = Adventure.query.filter_by(id=adventure_id, status="Em andamento").first()
+
+    except ValueError:
+        flash("ID de aventura inválido.", "danger")
+        return redirect(url_for('sala_do_mestre'))
+
+    # Definir o usuário atual como responsável pela aventura
+    adventure.responsible_user_id = current_user.id
+    adventure.status = "Finalizada"
     db.session.commit()
     
     flash("Aventura finalizada e salva com sucesso!", "success")

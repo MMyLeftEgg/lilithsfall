@@ -29,9 +29,9 @@
                 </li>
                 <li><a href="{{ url_for('campaigns') }}">Aventuras</a>
                     <ul>
-                        <li><a href="{{ url_for('show_characters_by_race', race='demonio') }}">Aventuras disponiveis </a></li>
-                        <li><a href="{{ url_for('show_characters_by_race', race='humano') }}">Aventuras em andamento</a></li>
-                        <li><a href="{{ url_for('show_characters_by_race', race='vampiro') }}">Aventuras Finalizadas.</a></li>
+                        <li><a href="{{ url_for('show_adventures', status='Disponivel') }}">Aventuras disponiveis </a></li>
+                        <li><a href="{{ url_for('show_adventures', status='Em andamento') }}">Aventuras em andamento</a></li>
+                        <li><a href="{{ url_for('show_adventures', status='Finalizada') }}">Aventuras Finalizadas.</a></li>
                         
                     </ul>
                 </li>
