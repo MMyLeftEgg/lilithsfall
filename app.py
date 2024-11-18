@@ -749,8 +749,7 @@ def sala_do_mestre():
     adventures = Adventure.query.all()
     music_playlist = Music.query.all()
     sfx_playlist = SFX.query.all()
-    final_adventures = AdventureFinished.query.all()  # Se precisar exibir aventuras finalizadas
-
+    final_adventures = Adventure.query.filter_by(status="Em andamento").all()
     return render_template('sala_do_mestre.html', 
                            adventures=adventures,
                            music_playlist=music_playlist,

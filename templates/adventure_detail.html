@@ -23,6 +23,8 @@
              {% if adventure.responsible_user %}
              <div class="responsible mt-4">
                  <strong>Responsável:</strong> {{ adventure.responsible_user.user }}
+                 <br>
+                 <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-primary">Acessar aventura</a>
              </div>
              {% endif %}
 
@@ -51,7 +53,11 @@
             </div>
             {% endif %}
         </div>
-
+            {% if adventure.status == 'Finalizada' %}   
+            <div class="mt-4">
+                <h5>Notas do mestre</h5>
+                <p>{{ adventure_finished.details }}</p>
+            </div>
         <!-- Coluna para a imagem -->
         <div class="col-md-4">
             {% if adventure.image %}
