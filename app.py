@@ -203,6 +203,7 @@ class Adventure(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Criador da aventura
     responsible_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Usuário responsável pela aventura
     status = db.Column(db.String(100), nullable=False, default='Disponivel')
+    finished = db.Column(db.String(500), nullable=True)  # aventura finalizada
 
     creator = db.relationship('User', foreign_keys=[creator_id])
     responsible_user = db.relationship('User', foreign_keys=[responsible_user_id])
@@ -213,7 +214,7 @@ class Adventure(db.Model):
     
     # Configuração para o upload
 UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'docx', 'mp3', 'wav', 'ogg'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'docx', 'mp3', 'wav', 'ogg', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Função para verificar extensão de arquivo
 def allowed_file(filename):
@@ -256,6 +257,7 @@ def create_adventure():
             document=document,
             image=image,
             creator_id=current_user.id  # Define o criador da aventura como o usuário atual
+            
         )
         db.session.add(new_adventure)
         db.session.commit()
@@ -749,7 +751,7 @@ def sala_do_mestre():
     adventures = Adventure.query.all()
     music_playlist = Music.query.all()
     sfx_playlist = SFX.query.all()
-    final_adventures = Adventure.query.filter_by(status="Em andamento").all()
+    final_adventures = Adventure.query.all()
     return render_template('sala_do_mestre.html', 
                            adventures=adventures,
                            music_playlist=music_playlist,
@@ -761,7 +763,7 @@ def sala_do_mestre():
 
 @app.route('/save_final_adventure', methods=['POST'])
 @login_required
-def save_final_adventure(status):
+def save_final_adventure():
     # Obter o ID da aventura do formulário
     adventure_id = request.form.get('adventure_id')
 
@@ -772,7 +774,7 @@ def save_final_adventure(status):
     # Buscar a aventura selecionada
     try:
         adventure_id = int(adventure_id)
-        adventure = Adventure.query.filter_by(id=adventure_id, status="Em andamento").first()
+        adventure = Adventure.query.all()
 
     except ValueError:
         flash("ID de aventura inválido.", "danger")

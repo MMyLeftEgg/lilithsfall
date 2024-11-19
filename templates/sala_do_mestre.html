@@ -14,7 +14,9 @@
                     <select name="adventure_id" id="adventure_id" class="form-select" required>
                         <option value="" disabled selected>Escolha uma Aventura...</option>
                         {% for adventure in adventures %}
+                        {% if adventure.status == 'Disponivel' %}
                         <option value="{{ adventure.id }}">{{ adventure.title }}</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -30,7 +32,9 @@
                     <select name="adventure_id" id="adventure_id" class="form-select" required>
                         <option value="" disabled selected>Escolha uma Aventura...</option>
                         {% for adventure in adventures %}
+                        {% if adventure.status == 'Em andamento' %}
                         <option value="{{ adventure.id }}">{{ adventure.title }}</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -48,11 +52,12 @@
                     {% if final_adventures %}
                     <ul class="list-group mb-3">
                         {% for adventure in final_adventures %}
+                        {% if adventure.status == 'Finalizada' %}
                         <li class="list-group-item">
                             <strong>{{ adventure.title }}</strong>
-                            <p>{{ adventure.details }}</p>
-                            <small>Finalizado por: {{ adventure.finisher.user }}</small>
+                            <p>{{ adventure.finished }}</p>
                         </li>
+                        {% endif %}
                         {% endfor %}
                     </ul>
                     {% else %}
