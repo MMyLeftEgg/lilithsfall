@@ -781,7 +781,6 @@ def save_final_adventure():
         return redirect(url_for('sala_do_mestre'))
 
     # Definir o usuário atual como responsável pela aventura
-    adventure.responsible_user_id = current_user.id
     adventure.status = "Finalizada"
     db.session.commit()
     
