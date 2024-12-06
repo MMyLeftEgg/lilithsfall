@@ -774,14 +774,15 @@ def save_final_adventure():
     # Buscar a aventura selecionada
     try:
         adventure_id = int(adventure_id)
-        adventure = Adventure.query.all()
+        adventure = Adventure.query.filter_by(id=adventure_id, status="Em andamento").first()
 
     except ValueError:
         flash("ID de aventura inválido.", "danger")
         return redirect(url_for('sala_do_mestre'))
 
-    # Definir o usuário atual como responsável pela aventura
-    adventure.status = "Finalizada"
+    # Definir o status da aventura como finalizada
+    adventure.responsible_user_id = current_user.id
+    adventure.status = 'Finalizada'
     db.session.commit()
     
     flash("Aventura finalizada e salva com sucesso!", "success")
