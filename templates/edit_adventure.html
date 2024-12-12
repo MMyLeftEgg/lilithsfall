@@ -31,6 +31,10 @@
                 <textarea class="form-control" id="description" name="description" rows="5" required>{{ adventure.description }}</textarea>
             </div>
             <div class="mb-3">
+                <label for="finished" class="form-label">Detalhes do fim da aventura</label>
+                <textarea class="form-control" id="finihsed" name="finished" rows="5" required>{{ adventure.finished }}</textarea>
+            </div>
+            <div class="mb-3">
                 <label for="document" class="form-label">Atualizar Documento</label>
                 <input type="file" class="form-control" id="document" name="document" accept=".pdf,.docx">
                 <!-- Exibe o documento atual -->

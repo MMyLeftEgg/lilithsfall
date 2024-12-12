@@ -33,8 +33,12 @@
                 <h5>Descrição</h5>
                 <p>{{ adventure.description }}</p>
             </div>
-
-
+            {% if adventure.status == 'Finalizada' %}
+                <div class="description mt-4">
+                    <h5>Detalhes do fim da aventura</h5>
+                    <p>{{ adventure.finished }}</p>
+                </div>
+            {% endif %}
             <!-- Botão de iniciar aventura (apenas se não houver responsável) -->
             {% if not adventure.responsible_user %}
             <form method="POST" action="{{ url_for('start_adventure', adventure_id=adventure.id) }}">

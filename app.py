@@ -322,6 +322,7 @@ def edit_adventure(adventure_id):
         adventure.requester = request.form['requester']
         adventure.reward = request.form['reward']
         adventure.description = request.form['description']
+        adventure.finished = request.form['finished']
 
         # Atualiza o arquivo de documento, se enviado
         if 'document' in request.files:
@@ -781,6 +782,10 @@ def save_final_adventure():
         return redirect(url_for('sala_do_mestre'))
 
     # Definir o status da aventura como finalizada
+    if request.method == 'POST':
+        # Atualiza os dados da aventura com os dados enviados no formulário
+        adventure.finished = request.form['finished']
+
     adventure.responsible_user_id = current_user.id
     adventure.status = 'Finalizada'
     db.session.commit()
