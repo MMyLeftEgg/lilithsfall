@@ -18,7 +18,7 @@
 
           <button type="submit" class="btn btn-primary w-100">Entrar</button>
         </form>
-
+        <a href="{{ url_for('forgot_password') }}" target="_blank">Esqueceu sua senha?</a><br>
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             <div class="mt-3">

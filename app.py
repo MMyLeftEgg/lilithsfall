@@ -3,8 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer, BadSignature
 from werkzeug.utils import secure_filename
 import os
+import re
 
 
 #https://sites.google.com/site/bradockrpg/vampiro-a-mascara-estruturas-vampiricas
@@ -33,6 +35,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     is_admin = db.Column(db.Boolean, default=True)
+    is_master = db.Column(db.Boolean, default=False)
+    reset_token = db.Column(db.String(100), nullable=True)  # Token para recuperação de senha
+   
 
 
     def set_password(self, password):
@@ -49,6 +54,21 @@ def user_loader(user_id):
     if user:
         return user
     return None
+
+# Função para validar a senha
+def is_password_valid(password):
+    """
+    Verifica se a senha atende aos critérios:
+    - Mínimo de 8 caracteres
+    - Pelo menos uma letra maiúscula
+    - Pelo menos uma letra minúscula
+    - Pelo menos um número
+    - Pelo menos um caractere especial (@, #, $, %)
+    """
+    pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%]).{8,}$'
+    return re.match(pattern, password)
+
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 # Rota de login
 @app.route('/login', methods=['GET', 'POST'])
@@ -77,6 +97,48 @@ def login():
             flash('Nome de usuário ou senha incorretos.', 'danger')
 
     return render_template('login.html')
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash('Email não encontrado.', 'danger')
+            return redirect(url_for('forgot_password'))
+
+        # Gerar token de recuperação
+        token = s.dumps(email, salt='password-reset-salt')
+        reset_url = url_for('reset_password', token=token, _external=True)
+        flash(f'Use o link para redefinir sua senha: {reset_url}', 'info')
+        # Aqui, você pode enviar um e-mail com `reset_url`.
+
+    return render_template('forgot_password.html')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)  # Expira em 1 hora
+    except BadSignature:
+        flash('Token inválido ou expirado.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form['password']
+        if len(password) < 8:
+            flash('Senha deve ter no mínimo 8 caracteres.', 'danger')
+            return redirect(url_for('reset_password', token=token))
+
+        hashed_password = generate_password_hash(password)
+        user = User.query.filter_by(email=email).first()
+        user.password = hashed_password
+        db.session.commit()
+
+        flash('Senha redefinida com sucesso!', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html')
+
 # Rota para dashboard (requer login)
 @app.route('/dashboard')
 @login_required
@@ -179,13 +241,29 @@ def register():
         password = request.form['password']
         email = request.form['email']
 
+        # Validação de senha
+        if not is_password_valid(password):
+            flash(
+                "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial (@, #, $, %).",
+                "danger"
+            )
+            return redirect(url_for('register'))
+
+        # Verificar se o e-mail já está registrado
+        if User.query.filter_by(email=email).first():
+            flash("E-mail já registrado. Tente novamente com outro e-mail.", "warning")
+            return redirect(url_for('register'))
+
+        # Verificar se o usuário já está registrado
+        if User.query.filter_by(user=user).first():
+            flash("Nome de usuário já registrado. Tente novamente com outro nome.", "warning")
+            return redirect(url_for('register'))
+
         # Cria um novo usuário e hashea a senha
         new_user = User(user=user, email=email)
         new_user.set_password(password)  # Hashear a senha antes de salvar
         db.session.add(new_user)
         db.session.commit()
-
-        new_user = User(user=user)
 
         flash('Registro realizado com sucesso! Faça login.', 'success')
         return redirect(url_for('login'))
