@@ -597,7 +597,7 @@ def index():
 
 @app.route('/characters')
 def characters():
-    return render_template('characters.html')
+    return render_template('characters.html', characters=characters)
 
 @app.route('/campaigns')
 def campaigns():
