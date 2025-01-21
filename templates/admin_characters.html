@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Personagens Criados pela Comunidade</h1>
+<div class="container mt-5">
+
+    <!-- Formulário para atualizar os personagens -->
+    <form method="POST" action="{{ url_for('update_characters') }}">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Clã</th>
+                    <th>Descrição</th>
+                    <th>Visivel?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for character in characters %}
+                <tr>
+                    <td>
+                        <input type="text" name="name_{{ important_character.id }}" value="{{ important_character.name }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <input type="text" name="clan_{{ important_character.id }}" value="{{ important_character.clan }}" class="form-control" required>
+                    </td>
+                    <td>
+                        <!-- Usando textarea para descrição -->
+                        <textarea name="description_{{ important_character.id }}" class="form-control" rows="3" required>{{ character.description }}</textarea>
+                    </td>
+                    <td>
+                        <!-- Botão para deletar -->
+                        <form method="POST" action="{{ url_for('delete_charactershow', id=character.id) }}" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success mt-3">Salvar Alterações</button>
+    </form>
+
+</div>
+<a href="{{ url_for('create_character') }}" class="btn btn-primary mt-4">Adicionar Novo Personagem</a>
+{% endblock %}

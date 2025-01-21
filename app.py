@@ -448,7 +448,7 @@ class ImportantCharacter(db.Model):
     description = db.Column(db.Text, nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Caminho da imagem
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem
-
+    visible = db.Column(db.Boolean, default=False)  # Visível para todos
 @app.route('/create_character', methods=['GET', 'POST'])
 @login_required
 def create_character():
