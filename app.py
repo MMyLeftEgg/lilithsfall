@@ -449,6 +449,42 @@ class ImportantCharacter(db.Model):
     image = db.Column(db.String(255), nullable=True)  # Caminho da imagem
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem
     visible = db.Column(db.Boolean, default=False)  # Visível para todos
+
+@app.route('/admin_characters')
+@login_required
+def admin_characters():
+    important_characters = ImportantCharacter.query.all()
+    return render_template('admin_characters.html', important_characters=important_characters)
+
+@app.route('/update_importantcharacters', methods=['POST'])
+@login_required
+def update_importantcharacters():
+    important_characters = ImportantCharacter.query.all()
+
+    # Percorre todos os personagens e atualiza seus valores com os dados enviados do formulário
+    for important_character in important_characters:
+        important_character.name = request.form.get(f'name_{important_character.id}')
+        important_character.race = request.form.get(f'race_{important_character.id}')
+        important_character.bloodline = request.form.get(f'bloodline_{important_character.id}')
+        important_character.clan = request.form.get(f'clan_{important_character.id}')
+        important_character.description = request.form.get(f'description_{important_character.id}')
+        important_character.visible = bool(request.form.get(f'visible_{important_character.id}'))
+
+    db.session.commit()  # Salva as mudanças no banco de dados
+    flash('Personagens atualizados com sucesso!', 'success')
+    return redirect(url_for('admin_characters'))
+
+@app.route('/delete_importantcharacter/<int:id>', methods=['POST'])
+@login_required
+def delete_importantcharacter(id):
+    import_character = ImportantCharacter.query.get_or_404(id)
+
+    db.session.delete(import_character)
+    db.session.commit()
+
+    flash('Personagem deletado com sucesso.', 'success')
+    return redirect(url_for('admin_characters'))
+
 @app.route('/create_character', methods=['GET', 'POST'])
 @login_required
 def create_character():
@@ -564,6 +600,8 @@ class Character(db.Model):
     def __repr__(self):
         return f'<Character {self.name}>'
 
+
+
 # Exibir personagens na página
 @app.route('/show_characters')
 @login_required
@@ -588,7 +626,6 @@ def update_characters():
     db.session.commit()  # Salva as mudanças no banco de dados
     flash('Personagens atualizados com sucesso!', 'success')
     return redirect(url_for('show_characters'))
-
 
 
 @app.route('/')
@@ -621,6 +658,7 @@ class Clan(db.Model):
     slogan = db.Column(db.Text, nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Caminho da imagem.
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do 
+    visible = db.Column(db.Boolean, default=False)  # Visível para todos
 
 @app.route('/create_clan', methods=['GET', 'POST'])
 @login_required

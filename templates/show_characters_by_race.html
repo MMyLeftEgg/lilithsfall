@@ -7,20 +7,22 @@
     <!-- Exibe cartões para cada personagem -->
     <div class="row">
         {% for character in characters %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                {% if character.image %}
-                <img src="{{ url_for('static', filename=character.image) }}" class="card-img-top" alt="{{ character.name }}" width="250px" height="350px">
-                {% else %}
-                <img src="{{ url_for('static', filename='img/default_character.jpg') }}" class="card-img-top" alt="Imagem padrão">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ character.name }}</h5>
-                    <p class="card-text">{{ character.clan if character.race == 'vampiro' else character.race }}</p>
-                    <a href="{{ url_for('character_detail', character_id=character.id) }}" class="btn btn-primary">Detalhes</a>
+            {% if character.visible == 1 %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        {% if character.image %}
+                        <img src="{{ url_for('static', filename=character.image) }}" class="card-img-top" alt="{{ character.name }}" width="250px" height="350px">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/default_character.jpg') }}" class="card-img-top" alt="Imagem padrão">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ character.name }}</h5>
+                            <p class="card-text">{{ character.clan if character.race == 'vampiro' else character.race }}</p>
+                            <a href="{{ url_for('character_detail', character_id=character.id) }}" class="btn btn-primary">Detalhes</a>
+                        </div>
+                    </div>
+            {% endif %}
                 </div>
-            </div>
-        </div>
         {% endfor %}
     </div>
 </div>
