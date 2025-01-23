@@ -450,6 +450,20 @@ class ImportantCharacter(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem
     visible = db.Column(db.Boolean, default=False)  # Visível para todos
 
+@app.route('/toggle_visibility/<int:character_id>', methods=['POST'])
+@login_required
+def toggle_visibility(character_id):
+    character = ImportantCharacter.query.get_or_404(character_id)
+    if not current_user.is_admin:
+        abort(403)
+
+    # Alternar o valor do campo visible
+    character.visible = not character.visible
+    db.session.commit()
+    flash('Visibilidade do personagem alterada com sucesso!', 'success')
+
+    return redirect(url_for('admin_characters')) 
+
 @app.route('/admin_characters')
 @login_required
 def admin_characters():

@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for important_character in importnat_characters %}
+                {% for important_character in important_characters %}
                 <tr>
                     <td>
                         <input type="text" name="name_{{ important_character.id }}" value="{{ important_character.name }}" class="form-control" required>
@@ -30,8 +30,16 @@
                     </td>
                     <td>
                         <!-- Usando textarea para descrição -->
-                        <textarea name="description_{{ important_character.id }}" class="form-control" rows="3" required>{{ importnat_character.description }}</textarea>
+                        <textarea name="description_{{ important_character.id }}" class="form-control" rows="3" required>{{ important_character.description }}</textarea>
                     </td>
+                    <td>
+                        {{ important_character.visible }}
+                    </td>
+                    <td>
+                        <!-- Botão para alternar visibilidade -->
+                        <form method="POST" action="{{ url_for('toggle_visibility', character_id=important_character.id) }}" style="display:inline;">
+                            <button type="submit" class="btn btn-warning btn-sm">Alternar Visibilidade</button>
+                        </form>
                     <td>
                         <!-- Botão para deletar -->
                         <form method="POST" action="{{ url_for('delete_importantcharacter', id=important_character.id) }}" style="display:inline;">
