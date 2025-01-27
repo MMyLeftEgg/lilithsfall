@@ -449,17 +449,31 @@ class ImportantCharacter(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem
     visible = db.Column(db.Boolean, default=False, nullable=False)  # Visível para todos
 
-@app.route('/toggle_visibility/<int:important_character_id>', methods=['POST'])
+@app.route('/set_visible/<int:important_character_id>', methods=['POST'])
 @login_required
-def toggle_visibility(important_character_id):
+def set_visible(important_character_id):
     important_character = ImportantCharacter.query.get_or_404(important_character_id)
+    if not current_user.is_admin:
+        abort(403)
+
+    # Definir o valor do campo visible para 1
+    important_character.visible = not important_character.visible
+    db.session.commit()
+    flash('Visibilidade do personagem alterada para visível!', 'success')
+
+    return redirect(url_for('admin_characters'))
+
+@app.route('/toggle_visibility/<int:character_id>', methods=['POST'])
+@login_required
+def toggle_visibility(character_id):
+    character = ImportantCharacter.query.get_or_404(character_id)
 
     # Log para depuração
-    print(f"Toggling visibility for character {important_character.id}, current visibility: {important_character.visible}")
+    print(f"Toggling visibility for character {character.id}, current visibility: {character.visible}")
 
     try:
         # Alternar o valor do campo visible
-        important_character.visible = not important_character.visible
+        character.visible = not character.visible
         db.session.commit()
         flash('Visibilidade do personagem alterada com sucesso!', 'success')
     except Exception as e:

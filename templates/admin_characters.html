@@ -46,8 +46,11 @@
                         <td>
                             <div class="d-flex gap-2">
                                 <!-- Botão para alternar visibilidade -->
-                                <form method="POST" action="{{ url_for('toggle_visibility', important_character_id=important_character.id) }}"onsubmit="return confirm('Tornar esse personagem visivel?');">
-                                    <button class="btn btn-warning btn-sm" type="submit" aria-label="Alterar visibilidade">
+                                <form method="POST" action="{{ url_for('toggle_visibility', character_id=important_character.id) }}"onsubmit="return confirm('Tornar esse personagem visivel?');">   
+                                </form>
+
+                                <form method="POST" action="{{ url_for('set_visible', important_character_id=important_character.id) }}" onsubmit="return confirm('Tornar esse personagem visível?');">
+                                    <button class="btn btn-warning btn-sm" type="submit" aria-label="Definir visibilidade">
                                         {{ 'Ocultar' if important_character.visible else 'Exibir' }}
                                     </button>
                                 </form>
