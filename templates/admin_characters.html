@@ -1,56 +1,70 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="mb-4">Personagens importantes</h1>
+<h1 class="mb-4">Personagens Importantes</h1>
 <div class="container mt-5">
 
     <!-- Formulário para atualizar os personagens -->
     <form method="POST" action="{{ url_for('update_importantcharacters') }}">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Clã</th>
-                    <th>Linhagem</th>
-                    <th>Descrição</th>
-                    <th>Visivel?</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for important_character in important_characters %}
-                <tr>
-                    <td>
-                        <input type="text" name="name_{{ important_character.id }}" value="{{ important_character.name }}" class="form-control" required>
-                    </td>
-                    <td>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Clã</th>
+                        <th>Raça</th>
+                        <th>Linhagem</th>
+                        <th>Descrição</th>
+                        <th>Visível?</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for important_character in important_characters %}
+                    <tr>
+                        <td>
+                            <input type="text" name="name_{{ important_character.id }}" value="{{ important_character.name }}" class="form-control" required>
+                        </td>
+                        <td>
                         <input type="text" name="clan_{{ important_character.id }}" value="{{ important_character.clan }}" class="form-control" required>
-                    </td>
-                    <td>
-                        <input type="text" name="bloodline_{{ important_character.id }}" value="{{ important_character.bloodline }}" class="form-control" required>
-                    </td>
-                    <td>
-                        <!-- Usando textarea para descrição -->
-                        <textarea name="description_{{ important_character.id }}" class="form-control" rows="3" required>{{ important_character.description }}</textarea>
-                    </td>
-                    <td>
-                        {{ important_character.visible }}
-                    </td>
-                    <td>
-                        <!-- Botão para alternar visibilidade -->
-                        <form method="POST" action="{{ url_for('toggle_visibility', character_id=important_character.id) }}" style="display:inline;">
-                            <button type="submit" class="btn btn-warning btn-sm">Alternar Visibilidade</button>
-                        </form>
-                    <td>
-                        <!-- Botão para deletar -->
-                        <form method="POST" action="{{ url_for('delete_importantcharacter', id=important_character.id) }}" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+                        </td>
+                        <td>
+                            <input type="text" name="race_{{ important_character.id }}" value="{{ important_character.race }}" class="form-control" required>
+                        </td>
+                        <td>
+                            <input type="text" name="bloodline_{{ important_character.id }}" value="{{ important_character.bloodline }}" class="form-control" required>
+                        </td>
+                        <td>
+                            <textarea name="description_{{ important_character.id }}" class="form-control" rows="3" required>{{ important_character.description }}</textarea>
+                        </td>
+                        <td>
+                            <!-- Visibilidade em texto claro -->
+                           <span class="{{ 'text-success' if important_character.visible else 'text-danger' }}">
+                               {{ 'Sim' if important_character.visible else 'Não' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <!-- Botão para alternar visibilidade -->
+                                <form method="POST" action="{{ url_for('toggle_visibility', important_character_id=important_character.id) }}"onsubmit="return confirm('Tornar esse personagem visivel?');">
+                                    <button class="btn btn-warning btn-sm" type="submit" aria-label="Alterar visibilidade">
+                                        {{ 'Ocultar' if important_character.visible else 'Exibir' }}
+                                    </button>
+                                </form>
+                            
+                                <!-- Botão para deletar -->
+                                <form method="POST" action="{{ url_for('delete_importantcharacter', id=important_character.id) }}" onsubmit="return confirm('Tem certeza que deseja deletar este personagem?');">
+                                    <button type="submit" class="btn btn-danger btn-sm" aria-label="Deletar personagem">
+                                        Deletar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>                    
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>        
         <button type="submit" class="btn btn-success mt-3">Salvar Alterações</button>
     </form>
 

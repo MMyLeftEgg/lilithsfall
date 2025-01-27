@@ -39,7 +39,6 @@ class User(UserMixin, db.Model):
     reset_token = db.Column(db.String(100), nullable=True)  # Token para recuperação de senha
    
 
-
     def set_password(self, password):
         """Hasheia a senha e a salva"""
         self.password = generate_password_hash(password)
@@ -448,21 +447,28 @@ class ImportantCharacter(db.Model):
     description = db.Column(db.Text, nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Caminho da imagem
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # Criador do personagem
-    visible = db.Column(db.Boolean, default=False)  # Visível para todos
+    visible = db.Column(db.Boolean, default=False, nullable=False)  # Visível para todos
 
-@app.route('/toggle_visibility/<int:character_id>', methods=['POST'])
+@app.route('/toggle_visibility/<int:important_character_id>', methods=['POST'])
 @login_required
-def toggle_visibility(character_id):
-    character = ImportantCharacter.query.get_or_404(character_id)
-    if not current_user.is_admin:
-        abort(403)
+def toggle_visibility(important_character_id):
+    important_character = ImportantCharacter.query.get_or_404(important_character_id)
 
-    # Alternar o valor do campo visible
-    character.visible = not character.visible
-    db.session.commit()
-    flash('Visibilidade do personagem alterada com sucesso!', 'success')
+    # Log para depuração
+    print(f"Toggling visibility for character {important_character.id}, current visibility: {important_character.visible}")
 
-    return redirect(url_for('admin_characters')) 
+    try:
+        # Alternar o valor do campo visible
+        important_character.visible = not important_character.visible
+        db.session.commit()
+        flash('Visibilidade do personagem alterada com sucesso!', 'success')
+    except Exception as e:
+        print(f"Erro ao alterar visibilidade: {e}")
+        flash('Erro ao alterar a visibilidade do personagem.', 'danger')
+
+    # Redirecionar para a página de administração
+    return redirect(url_for('admin_characters'))
+
 
 @app.route('/admin_characters')
 @login_required
@@ -475,7 +481,7 @@ def admin_characters():
 def update_importantcharacters():
     important_characters = ImportantCharacter.query.all()
 
-    # Percorre todos os personagens e atualiza seus valores com os dados enviados do formulário
+    # Percorre todos os personagens importantes e atualiza seus valores com os dados enviados do formulário
     for important_character in important_characters:
         important_character.name = request.form.get(f'name_{important_character.id}')
         important_character.race = request.form.get(f'race_{important_character.id}')
@@ -485,8 +491,10 @@ def update_importantcharacters():
         important_character.visible = bool(request.form.get(f'visible_{important_character.id}'))
 
     db.session.commit()  # Salva as mudanças no banco de dados
-    flash('Personagens atualizados com sucesso!', 'success')
+    flash('Personagens importantes atualizados com sucesso!', 'success')
     return redirect(url_for('admin_characters'))
+
+
 
 @app.route('/delete_importantcharacter/<int:id>', methods=['POST'])
 @login_required
