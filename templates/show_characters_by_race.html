@@ -13,7 +13,7 @@
                         {% if character.image %}
                         <img src="{{ url_for('static', filename=character.image) }}" class="card-img-top" alt="{{ character.name }}" width="250px" height="350px">
                         {% else %}
-                        <img src="{{ url_for('static', filename='img/default_character.jpg') }}" class="card-img-top" alt="Imagem padrão">
+                        <img src="{{ url_for('static', filename='img/default.jpg') }}" class="card-img-top" alt="Imagem padrão">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ character.name }}</h5>

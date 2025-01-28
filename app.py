@@ -37,6 +37,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=True)
     is_master = db.Column(db.Boolean, default=False)
     reset_token = db.Column(db.String(100), nullable=True)  # Token para recuperação de senha
+    user_image = db.Column(db.String(255), nullable=True)  # Caminho da imagem do usuário
    
 
     def set_password(self, password):
@@ -143,6 +144,11 @@ def reset_password(token):
 @login_required
 def dashboard():
     return render_template('dashboard.html', user=current_user.user if current_user.is_authenticated else None)
+
+@app.route('/dashboard2')
+@login_required
+def dashboard2():
+    return render_template('dashboard2.html',  user=current_user.user if current_user.is_authenticated else None)
 
 @app.route('/admin_logins')
 @login_required  # Somente usuários logados podem acessar
@@ -487,7 +493,7 @@ def toggle_visibility(character_id):
 @app.route('/admin_characters')
 @login_required
 def admin_characters():
-    important_characters = ImportantCharacter.query.all()
+    important_characters = ImportantCharacter.query.order_by(ImportantCharacter.id.desc()).all()
     return render_template('admin_characters.html', important_characters=important_characters)
 
 @app.route('/update_importantcharacters', methods=['POST'])
@@ -554,7 +560,7 @@ def create_character():
         db.session.add(new_character)
         db.session.commit()
         flash('Personagem criado com sucesso!', 'success')
-        return redirect(url_for('show_characters_by_race', race=race))
+        return redirect(url_for('admin_characters', race=race))
 
     return render_template('create_character.html')
 
@@ -670,6 +676,7 @@ def index():
 
 @app.route('/characters')
 def characters():
+    characters = ImportantCharacter.query.all()
     return render_template('characters.html', characters=characters)
 
 @app.route('/campaigns')
