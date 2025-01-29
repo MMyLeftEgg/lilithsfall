@@ -96,7 +96,7 @@ def login():
         else:
             flash('Nome de usuário ou senha incorretos.', 'danger')
 
-    return render_template('login.html')
+    return render_template('signin.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -273,7 +273,7 @@ def register():
         flash('Registro realizado com sucesso! Faça login.', 'success')
         return redirect(url_for('login'))
 
-    return render_template('register.html')
+    return render_template('signup.html')
 
 class Adventure(db.Model):
     id = db.Column(db.Integer, primary_key=True)
