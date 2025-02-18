@@ -1071,6 +1071,15 @@ def delete_sfx(sfx_id):
 
     return redirect(url_for('sala_do_mestre'))
 
+@app.route('/my_profile')
+@login_required
+def my_profile():
+    return render_template('my_profile.html')
+
+@app.route('/404')
+def page_404():
+    return render_template('404.html'), 404
+
 
 if __name__ == '__main__':
    
