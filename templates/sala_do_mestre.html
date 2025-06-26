@@ -1,76 +1,629 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <!-- Área para Iniciar ou Finalizar Aventuras -->
+<div class="container-fluid mt-5">
     <div class="row">
+        <!-- Coluna principal - Gerenciamento de Aventuras -->
         <div class="col-md-8">
             <h2>Sala do Mestre</h2>
+            
+            <!-- Abas para navegação entre ferramentas -->
+            <ul class="nav nav-tabs mb-4" id="masterTools" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="adventures-tab" data-bs-toggle="tab" data-bs-target="#adventures" type="button" role="tab" aria-controls="adventures" aria-selected="true">Aventuras</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="npc-generator-tab" data-bs-toggle="tab" data-bs-target="#npc-generator" type="button" role="tab" aria-controls="npc-generator" aria-selected="false">Gerador de NPCs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dice-roller-tab" data-bs-toggle="tab" data-bs-target="#dice-roller" type="button" role="tab" aria-controls="dice-roller" aria-selected="false">Rolador de Dados</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="initiative-tab" data-bs-toggle="tab" data-bs-target="#initiative" type="button" role="tab" aria-controls="initiative" aria-selected="false">Iniciativa</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="monsters-tab" data-bs-toggle="tab" data-bs-target="#monsters" type="button" role="tab" aria-controls="monsters" aria-selected="false">Monstros</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="maps-tab" data-bs-toggle="tab" data-bs-target="#maps" type="button" role="tab" aria-controls="maps" aria-selected="false">Mapas</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tools-tab" data-bs-toggle="tab" data-bs-target="#tools" type="button" role="tab" aria-controls="tools" aria-selected="false">Ferramentas</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Anotações</button>
+                </li>
+            </ul>
+            
+            <!-- Conteúdo das abas -->
+            <div class="tab-content" id="masterToolsContent">
+                <!-- Aba de Aventuras -->
+                <div class="tab-pane fade show active" id="adventures" role="tabpanel" aria-labelledby="adventures-tab">
+                    <!-- Formulário para Iniciar Aventura -->
+                    <form method="POST" id="start-adventure-form" action="{{ url_for('start_adventure') }}">
+                        <div class="mb-3">
+                            <label for="adventure_id" class="form-label">Selecionar Aventura para Iniciar</label>
+                            <select name="adventure_id" id="adventure_id" class="form-select" required>
+                                <option value="" disabled selected>Escolha uma Aventura...</option>
+                                {% for adventure in adventures %}
+                                {% if adventure.status == 'Disponivel' %}
+                                <option value="{{ adventure.id }}">{{ adventure.title }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Iniciar Aventura</button>
+                    </form>
 
-            <!-- Formulário para Iniciar Aventura -->
-            <form method="POST" id="start-adventure-form" action="{{ url_for('start_adventure') }}">
-                <div class="mb-3">
-                    <label for="adventure_id" class="form-label">Selecionar Aventura para Iniciar</label>
-                    <select name="adventure_id" id="adventure_id" class="form-select" required>
-                        <option value="" disabled selected>Escolha uma Aventura...</option>
-                        {% for adventure in adventures %}
-                        {% if adventure.status == 'Disponivel' %}
-                        <option value="{{ adventure.id }}">{{ adventure.title }}</option>
-                        {% endif %}
-                        {% endfor %}
-                    </select>
+                    <!-- Botão de Finalizar Aventura -->
+                    <button id="finalize-adventure-btn" class="btn btn-danger mt-4">Finalizar Aventura</button>
+
+                    <!-- Formulário para Salvar Detalhes da Aventura Finalizada (escondido inicialmente) -->
+                    <form method="POST" id="save-final-adventure-form" action="{{ url_for('save_final_adventure') }}" class="mt-4" style="display: none;">
+                        <div class="mb-3">
+                            <select name="adventure_id" id="adventure_id" class="form-select" required>
+                                <option value="" disabled selected>Escolha uma Aventura...</option>
+                                {% for adventure in adventures %}
+                                {% if adventure.status == 'Em andamento' %}
+                                <option value="{{ adventure.id }}">{{ adventure.title }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="finished" class="form-label">Detalhes da Aventura Finalizada</label>
+                            <textarea class="form-control" id="finished" name="finished" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Aventura Finalizada</button>
+                    </form>
+
+                    <!-- Submenu para Aventuras Finalizadas -->
+                    <div class="row mt-5">
+                        <div class="col-md-12">
+                            <h3>Aventuras Finalizadas</h3>
+                            {% if final_adventures %}
+                            <ul class="list-group mb-3">
+                                {% for adventure in final_adventures %}
+                                {% if adventure.status == 'Finalizada' %}
+                                <li class="list-group-item">
+                                    <strong>{{ adventure.title }}</strong>
+                                    <p>{{ adventure.finished }}</p>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p>Nenhuma aventura em andamento.</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-success">Iniciar Aventura</button>
-            </form>
-
-            <!-- Botão de Finalizar Aventura -->
-            <button id="finalize-adventure-btn" class="btn btn-danger mt-4">Finalizar Aventura</button>
-
-            <!-- Formulário para Salvar Detalhes da Aventura Finalizada (escondido inicialmente) -->
-            <form method="POST" id="save-final-adventure-form" action="{{ url_for('save_final_adventure') }}" class="mt-4" style="display: none;">
-                <div class="mb-3">
-                    <select name="adventure_id" id="adventure_id" class="form-select" required>
-                        <option value="" disabled selected>Escolha uma Aventura...</option>
-                        {% for adventure in adventures %}
-                        {% if adventure.status == 'Em andamento' %}
-                        <option value="{{ adventure.id }}">{{ adventure.title }}</option>
-                        {% endif %}
-                        {% endfor %}
-                    </select>
+                
+                <!-- Aba do Gerador de NPCs -->
+                <div class="tab-pane fade" id="npc-generator" role="tabpanel" aria-labelledby="npc-generator-tab">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Gerador de NPCs</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Configurações</h6>
+                                    <div class="mb-3">
+                                        <label for="npc-race" class="form-label">Raça</label>
+                                        <select id="npc-race" class="form-select">
+                                            <option value="vampire">Vampiro</option>
+                                            <option value="human">Humano</option>
+                                            <option value="demon">Demônio</option>
+                                            <option value="werewolf">Lobisomem</option>
+                                            <option value="ghost">Fantasma</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="npc-clan" class="form-label">Clã/Tipo</label>
+                                        <select id="npc-clan" class="form-select">
+                                            <option value="random">Aleatório</option>
+                                            <option value="ventrue">Ventrue</option>
+                                            <option value="toreador">Toreador</option>
+                                            <option value="nosferatu">Nosferatu</option>
+                                            <option value="tremere">Tremere</option>
+                                            <option value="brujah">Brujah</option>
+                                            <option value="malkavian">Malkavian</option>
+                                            <option value="gangrel">Gangrel</option>
+                                            <option value="tzimisce">Tzimisce</option>
+                                            <option value="lasombra">Lasombra</option>
+                                            <option value="assamite">Assamita</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="npc-power" class="form-label">Nível de Poder</label>
+                                        <select id="npc-power" class="form-select">
+                                            <option value="weak">Fraco</option>
+                                            <option value="average" selected>Médio</option>
+                                            <option value="strong">Forte</option>
+                                            <option value="elder">Ancião</option>
+                                        </select>
+                                    </div>
+                                    <button id="generate-npc" class="btn btn-primary">Gerar NPC</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="npc-result" class="p-3 border rounded" style="min-height: 300px;">
+                                        <h6 class="text-center">NPC Gerado</h6>
+                                        <div id="npc-details">
+                                            <p class="text-muted text-center">Clique em "Gerar NPC" para criar um personagem</p>
+                                        </div>
+                                    </div>
+                                    <button id="save-npc" class="btn btn-success mt-2" disabled>Salvar NPC</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="finished" class="form-label">Detalhes da Aventura Finalizada</label>
-                    <textarea class="form-control" id="finished" name="finished" rows="5" required></textarea>
+                
+                <!-- Aba do Rolador de Dados -->
+                <div class="tab-pane fade" id="dice-roller" role="tabpanel" aria-labelledby="dice-roller-tab">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Rolador de Dados Virtual</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dice-type" class="form-label">Tipo de Dado</label>
+                                        <select id="dice-type" class="form-select">
+                                            <option value="4">D4</option>
+                                            <option value="6">D6</option>
+                                            <option value="8">D8</option>
+                                            <option value="10" selected>D10</option>
+                                            <option value="12">D12</option>
+                                            <option value="20">D20</option>
+                                            <option value="100">D100</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="dice-count" class="form-label">Quantidade de Dados</label>
+                                        <input type="number" id="dice-count" class="form-control" min="1" max="20" value="1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="dice-modifier" class="form-label">Modificador</label>
+                                        <input type="number" id="dice-modifier" class="form-control" value="0">
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dice-difficulty-check">
+                                            <label class="form-check-label" for="dice-difficulty-check">
+                                                Usar Dificuldade
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3" id="difficulty-container" style="display: none;">
+                                        <label for="dice-difficulty" class="form-label">Dificuldade</label>
+                                        <input type="number" id="dice-difficulty" class="form-control" min="1" value="6">
+                                    </div>
+                                    <button id="roll-dice" class="btn btn-primary">Rolar Dados</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded">
+                                        <h6>Resultado</h6>
+                                        <div id="dice-result" class="text-center p-3" style="min-height: 100px;">
+                                            <span class="display-4">-</span>
+                                        </div>
+                                        <div id="dice-details" class="small text-muted mt-2"></div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <h6>Histórico de Rolagens</h6>
+                                        <div id="dice-history" class="p-2 border rounded" style="height: 150px; overflow-y: auto;">
+                                            <!-- Histórico de rolagens será adicionado aqui -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Salvar Aventura Finalizada</button>
-            </form>
-
-            <!-- Submenu para Aventuras Finalizadas -->
-            <div class="row mt-5">
-                <div class="col-md-12">
-                    <h3>Aventuras Finalizadas</h3>
-                    {% if final_adventures %}
-                    <ul class="list-group mb-3">
-                        {% for adventure in final_adventures %}
-                        {% if adventure.status == 'Finalizada' %}
-                        <li class="list-group-item">
-                            <strong>{{ adventure.title }}</strong>
-                            <p>{{ adventure.finished }}</p>
-                        </li>
-                        {% endif %}
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>Nenhuma aventura em andamento.</p>
-                    {% endif %}
+                
+                <!-- Aba do Gerenciador de Iniciativa -->
+                <div class="tab-pane fade" id="initiative" role="tabpanel" aria-labelledby="initiative-tab">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Gerenciador de Iniciativa</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <input type="text" id="init-name" class="form-control" placeholder="Nome do Personagem">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" id="init-value" class="form-control" placeholder="Valor de Iniciativa">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="init-type" class="form-select">
+                                        <option value="player">Jogador</option>
+                                        <option value="npc">NPC</option>
+                                        <option value="enemy">Inimigo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button id="add-initiative" class="btn btn-primary w-100">Adicionar</button>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between">
+                                        <button id="sort-initiative" class="btn btn-secondary">Ordenar</button>
+                                        <button id="next-turn" class="btn btn-success" disabled>Próximo Turno</button>
+                                        <button id="reset-initiative" class="btn btn-danger">Reiniciar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Turno</th>
+                                                    <th>Nome</th>
+                                                    <th>Iniciativa</th>
+                                                    <th>Tipo</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="initiative-list">
+                                                <!-- Lista de iniciativa será preenchida aqui -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aba da Biblioteca de Monstros -->
+                <div class="tab-pane fade" id="monsters" role="tabpanel" aria-labelledby="monsters-tab">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Biblioteca de Monstros e Antagonistas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <input type="text" id="monster-search" class="form-control" placeholder="Pesquisar monstros...">
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="monster-filter" class="form-select">
+                                        <option value="all">Todos os Tipos</option>
+                                        <option value="vampire">Vampiros</option>
+                                        <option value="werewolf">Lobisomens</option>
+                                        <option value="demon">Demônios</option>
+                                        <option value="ghost">Fantasmas</option>
+                                        <option value="human">Humanos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="list-group" id="monster-list" style="height: 400px; overflow-y: auto;">
+                                        <!-- Lista de monstros será preenchida aqui -->
+                                        <a href="#" class="list-group-item list-group-item-action" data-monster="vampire-elder">Vampiro Ancião</a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-monster="werewolf-alpha">Lobisomem Alfa</a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-monster="demon-possessor">Demônio Possessor</a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-monster="ghost-vengeful">Fantasma Vingativo</a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-monster="human-hunter">Caçador Humano</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div id="monster-details" class="p-3 border rounded" style="height: 400px; overflow-y: auto;">
+                                        <p class="text-muted text-center">Selecione um monstro para ver os detalhes</p>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button id="add-to-initiative" class="btn btn-success" disabled>Adicionar à Iniciativa</button>
+                                        <button id="add-new-monster" class="btn btn-primary float-end">Adicionar Novo Monstro</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aba do Mapa Interativo -->
+                <div class="tab-pane fade" id="maps" role="tabpanel" aria-labelledby="maps-tab">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Mapa Interativo</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <select id="map-select" class="form-select">
+                                        <option value="">Selecione um mapa...</option>
+                                        <option value="city">Cidade de São Paulo</option>
+                                        <option value="mansion">Mansão Ventrue</option>
+                                        <option value="sewers">Esgotos de Nosferatu</option>
+                                        <option value="forest">Floresta dos Gangrel</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button id="upload-map" class="btn btn-primary">Carregar Novo Mapa</button>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <div id="map-container" class="border rounded p-2" style="height: 500px; position: relative;">
+                                        <div id="map-canvas" style="width: 100%; height: 100%; background-color: #333;">
+                                            <p class="text-white text-center pt-5">Selecione um mapa para começar</p>
+                                        </div>
+                                        <div id="fog-of-war" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <h6>Ferramentas</h6>
+                                        <div class="btn-group-vertical w-100">
+                                            <button id="tool-fog" class="btn btn-outline-secondary">Revelar/Ocultar Área</button>
+                                            <button id="tool-token" class="btn btn-outline-secondary">Adicionar Token</button>
+                                            <button id="tool-measure" class="btn btn-outline-secondary">Medir Distância</button>
+                                            <button id="tool-draw" class="btn btn-outline-secondary">Desenhar</button>
+                                            <button id="tool-text" class="btn btn-outline-secondary">Adicionar Texto</button>
+                                            <button id="tool-clear" class="btn btn-outline-danger">Limpar Tudo</button>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6>Compartilhar</h6>
+                                        <button id="share-map" class="btn btn-success w-100">Compartilhar com Jogadores</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aba de Ferramentas Adicionais -->
+                <div class="tab-pane fade" id="tools" role="tabpanel" aria-labelledby="tools-tab">
+                    <div class="row">
+                        <!-- Temporizador de Jogo -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0">Temporizador de Jogo</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="timer-minutes" class="form-label">Minutos</label>
+                                        <input type="number" id="timer-minutes" class="form-control" min="0" value="5">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="timer-seconds" class="form-label">Segundos</label>
+                                        <input type="number" id="timer-seconds" class="form-control" min="0" max="59" value="0">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="timer-label" class="form-label">Descrição</label>
+                                        <input type="text" id="timer-label" class="form-control" placeholder="Ex: Tempo para decisão">
+                                    </div>
+                                    <div class="text-center">
+                                        <div id="timer-display" class="display-4 mb-3">05:00</div>
+                                        <div class="btn-group">
+                                            <button id="timer-start" class="btn btn-success">Iniciar</button>
+                                            <button id="timer-pause" class="btn btn-warning" disabled>Pausar</button>
+                                            <button id="timer-reset" class="btn btn-danger" disabled>Reiniciar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gerador de Tesouros -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0">Gerador de Tesouros e Recompensas</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="treasure-type" class="form-label">Tipo de Tesouro</label>
+                                        <select id="treasure-type" class="form-select">
+                                            <option value="money">Dinheiro</option>
+                                            <option value="item">Item Comum</option>
+                                            <option value="magic">Item Mágico</option>
+                                            <option value="artifact">Artefato</option>
+                                            <option value="mixed">Misto</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="treasure-level" class="form-label">Nível de Valor</label>
+                                        <select id="treasure-level" class="form-select">
+                                            <option value="low">Baixo</option>
+                                            <option value="medium" selected>Médio</option>
+                                            <option value="high">Alto</option>
+                                            <option value="legendary">Lendário</option>
+                                        </select>
+                                    </div>
+                                    <button id="generate-treasure" class="btn btn-primary">Gerar Tesouro</button>
+                                    
+                                    <div class="mt-3 p-3 border rounded">
+                                        <h6>Tesouro Gerado</h6>
+                                        <div id="treasure-result" style="min-height: 100px;">
+                                            <p class="text-muted">Clique em "Gerar Tesouro" para criar recompensas</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Clima e Ambiente -->
+                        <div class="col-md-12 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0">Clima e Ambiente</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <h6>Clima</h6>
+                                            <div class="mb-3">
+                                                <select id="weather-type" class="form-select">
+                                                    <option value="clear">Céu Limpo</option>
+                                                    <option value="cloudy">Nublado</option>
+                                                    <option value="rain">Chuva</option>
+                                                    <option value="storm">Tempestade</option>
+                                                    <option value="fog">Névoa</option>
+                                                    <option value="snow">Neve</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="weather-intensity" class="form-label">Intensidade</label>
+                                                <input type="range" class="form-range" id="weather-intensity" min="1" max="10" value="5">
+                                            </div>
+                                            <button id="apply-weather" class="btn btn-primary">Aplicar Clima</button>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Iluminação</h6>
+                                            <div class="mb-3">
+                                                <select id="lighting-type" class="form-select">
+                                                    <option value="day">Dia</option>
+                                                    <option value="dusk">Entardecer</option>
+                                                    <option value="night">Noite</option>
+                                                    <option value="moonlight">Luz da Lua</option>
+                                                    <option value="torch">Tochas</option>
+                                                    <option value="dark">Escuridão</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="lighting-intensity" class="form-label">Intensidade</label>
+                                                <input type="range" class="form-range" id="lighting-intensity" min="1" max="10" value="5">
+                                            </div>
+                                            <button id="apply-lighting" class="btn btn-primary">Aplicar Iluminação</button>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Ambiente</h6>
+                                            <div class="mb-3">
+                                                <select id="ambient-type" class="form-select">
+                                                    <option value="city">Cidade</option>
+                                                    <option value="forest">Floresta</option>
+                                                    <option value="dungeon">Masmorra</option>
+                                                    <option value="castle">Castelo</option>
+                                                    <option value="tavern">Taverna</option>
+                                                    <option value="custom">Personalizado</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="ambient-volume" class="form-label">Volume</label>
+                                                <input type="range" class="form-range" id="ambient-volume" min="0" max="100" value="50">
+                                            </div>
+                                            <button id="apply-ambient" class="btn btn-primary">Aplicar Ambiente</button>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div id="weather-preview" class="p-3 border rounded" style="height: 100px; background-color: #333; position: relative;">
+                                            <div id="weather-effect" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+                                            <p class="text-white text-center" style="position: relative; z-index: 10;">Visualização do clima e ambiente</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aba de Anotações de Campanha -->
+                <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Anotações de Campanha</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="note-title" class="form-label">Título</label>
+                                        <input type="text" id="note-title" class="form-control" placeholder="Título da anotação">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="note-category" class="form-label">Categoria</label>
+                                        <select id="note-category" class="form-select">
+                                            <option value="plot">Enredo Principal</option>
+                                            <option value="npc">NPCs</option>
+                                            <option value="location">Locais</option>
+                                            <option value="quest">Missões</option>
+                                            <option value="lore">História do Mundo</option>
+                                            <option value="other">Outros</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button id="save-note" class="btn btn-primary">Salvar Anotação</button>
+                                        <button id="new-note" class="btn btn-secondary">Nova Anotação</button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6>Anotações Salvas</h6>
+                                        <div id="notes-list" class="list-group" style="height: 300px; overflow-y: auto;">
+                                            <!-- Lista de anotações será preenchida aqui -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="note-content" class="form-label">Conteúdo</label>
+                                        <textarea id="note-content" class="form-control" rows="15" placeholder="Escreva suas anotações aqui..."></textarea>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <button id="share-note" class="btn btn-success" disabled>Compartilhar com Jogadores</button>
+                                        </div>
+                                        <div>
+                                            <button id="delete-note" class="btn btn-danger" disabled>Excluir Anotação</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Área para playlists de música e efeitos sonoros -->
+        
+        <!-- Coluna lateral - Playlists e Compartilhamento -->
         <div class="col-md-4">
-            <h4>Playlists</h4>
-
+            <!-- Área de Compartilhamento de Tela -->
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Compartilhamento de Tela</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="share-content" class="form-label">Conteúdo para Compartilhar</label>
+                        <select id="share-content" class="form-select">
+                            <option value="image">Imagem</option>
+                            <option value="map">Mapa</option>
+                            <option value="text">Texto</option>
+                            <option value="handout">Handout</option>
+                        </select>
+                    </div>
+                    <div id="share-image-container" class="mb-3">
+                        <label for="share-image" class="form-label">Selecionar Imagem</label>
+                        <input type="file" id="share-image" class="form-control" accept="image/*">
+                    </div>
+                    <div id="share-text-container" class="mb-3" style="display: none;">
+                        <label for="share-text" class="form-label">Texto para Compartilhar</label>
+                        <textarea id="share-text" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button id="share-with-players" class="btn btn-success">Compartilhar com Jogadores</button>
+                    <button id="clear-shared" class="btn btn-secondary">Limpar Compartilhado</button>
+                    
+                    <div class="mt-3 p-2 border rounded">
+                        <h6>Visualização</h6>
+                        <div id="share-preview" style="height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            <p class="text-muted">Selecione conteúdo para compartilhar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Playlist de músicas -->
             <div class="playlist mt-3">
                 <h5>Playlist de Músicas</h5>
@@ -121,29 +674,8 @@
                     <button type="submit" class="btn btn-primary btn-sm">Adicionar Efeito Sonoro</button>
                   </form>
                 {% endif %}
-              </div>
-              
-              <script>
-              // Adicionar ouvintes de eventos para os botões de loop
-            const loopButtons = document.querySelectorAll('.btn-loop');
-
-            loopButtons.forEach(button => {
-            button.addEventListener('click', function() {
-            const audioElement = document.getElementById('sfx-' + this.id.split('-')[2]);
-
-            // Verifica se o áudio está em loop
-            if (audioElement.loop) {
-             audioElement.loop = false; // Desativa o loop
-            audioElement.pause(); // Para o áudio
-            this.textContent = 'Loop'; // Atualiza o texto do botão
-            } else {
-            audioElement.loop = true; // Ativa o loop
-            audioElement.play(); // Inicia o áudio
-            this.textContent = 'Looping'; // Atualiza o texto do botão
-            }
-         });
-        });
-              </script> 
+            </div>
+        </div>
     </div>
 </div>
 
@@ -152,5 +684,336 @@
     document.getElementById('finalize-adventure-btn').addEventListener('click', function () {
         document.getElementById('save-final-adventure-form').style.display = 'block';
     });
+    
+    // Adicionar ouvintes de eventos para os botões de loop
+    const loopButtons = document.querySelectorAll('.btn-loop');
+
+    loopButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const audioElement = document.getElementById('sfx-' + this.id.split('-')[2]);
+
+            // Verifica se o áudio está em loop
+            if (audioElement.loop) {
+                audioElement.loop = false; // Desativa o loop
+                audioElement.pause(); // Para o áudio
+                this.textContent = 'Loop'; // Atualiza o texto do botão
+            } else {
+                audioElement.loop = true; // Ativa o loop
+                audioElement.play(); // Inicia o áudio
+                this.textContent = 'Looping'; // Atualiza o texto do botão
+            }
+        });
+    });
+    
+    // Gerador de NPCs
+    document.getElementById('generate-npc').addEventListener('click', function() {
+        const race = document.getElementById('npc-race').value;
+        const clan = document.getElementById('npc-clan').value;
+        const power = document.getElementById('npc-power').value;
+        
+        // Nomes aleatórios baseados na raça
+        const vampireNames = ['Lucian', 'Eliza', 'Viktor', 'Selene', 'Markus', 'Amelia', 'Kraven', 'Sonja'];
+        const humanNames = ['Carlos', 'Maria', 'João', 'Ana', 'Pedro', 'Lucia', 'Roberto', 'Fernanda'];
+        const demonNames = ['Abaddon', 'Lilith', 'Baal', 'Asmodeus', 'Mephisto', 'Belial', 'Mammon', 'Leviathan'];
+        const werewolfNames = ['Fenrir', 'Luna', 'Garra', 'Silvano', 'Lobo', 'Uivante', 'Pelagem', 'Presas'];
+        const ghostNames = ['Espectro', 'Sombra', 'Eco', 'Sussurro', 'Névoa', 'Lamento', 'Etéreo', 'Assombração'];
+        
+        let names;
+        switch(race) {
+            case 'vampire': names = vampireNames; break;
+            case 'human': names = humanNames; break;
+            case 'demon': names = demonNames; break;
+            case 'werewolf': names = werewolfNames; break;
+            case 'ghost': names = ghostNames; break;
+            default: names = humanNames;
+        }
+        
+        const randomName = names[Math.floor(Math.random() * names.length)];
+        
+        // Gerar atributos baseados no nível de poder
+        let attributes = {};
+        let powerLevel;
+        
+        switch(power) {
+            case 'weak':
+                powerLevel = 'Fraco';
+                attributes = {
+                    força: Math.floor(Math.random() * 2) + 1,
+                    destreza: Math.floor(Math.random() * 2) + 1,
+                    vigor: Math.floor(Math.random() * 2) + 1,
+                    carisma: Math.floor(Math.random() * 2) + 1,
+                    manipulação: Math.floor(Math.random() * 2) + 1,
+                    aparência: Math.floor(Math.random() * 2) + 1,
+                    percepção: Math.floor(Math.random() * 2) + 1,
+                    inteligência: Math.floor(Math.random() * 2) + 1,
+                    raciocínio: Math.floor(Math.random() * 2) + 1
+                };
+                break;
+            case 'average':
+                powerLevel = 'Médio';
+                attributes = {
+                    força: Math.floor(Math.random() * 2) + 2,
+                    destreza: Math.floor(Math.random() * 2) + 2,
+                    vigor: Math.floor(Math.random() * 2) + 2,
+                    carisma: Math.floor(Math.random() * 2) + 2,
+                    manipulação: Math.floor(Math.random() * 2) + 2,
+                    aparência: Math.floor(Math.random() * 2) + 2,
+                    percepção: Math.floor(Math.random() * 2) + 2,
+                    inteligência: Math.floor(Math.random() * 2) + 2,
+                    raciocínio: Math.floor(Math.random() * 2) + 2
+                };
+                break;
+            case 'strong':
+                powerLevel = 'Forte';
+                attributes = {
+                    força: Math.floor(Math.random() * 2) + 3,
+                    destreza: Math.floor(Math.random() * 2) + 3,
+                    vigor: Math.floor(Math.random() * 2) + 3,
+                    carisma: Math.floor(Math.random() * 2) + 3,
+                    manipulação: Math.floor(Math.random() * 2) + 3,
+                    aparência: Math.floor(Math.random() * 2) + 3,
+                    percepção: Math.floor(Math.random() * 2) + 3,
+                    inteligência: Math.floor(Math.random() * 2) + 3,
+                    raciocínio: Math.floor(Math.random() * 2) + 3
+                };
+                break;
+            case 'elder':
+                powerLevel = 'Ancião';
+                attributes = {
+                    força: Math.floor(Math.random() * 2) + 4,
+                    destreza: Math.floor(Math.random() * 2) + 4,
+                    vigor: Math.floor(Math.random() * 2) + 4,
+                    carisma: Math.floor(Math.random() * 2) + 4,
+                    manipulação: Math.floor(Math.random() * 2) + 4,
+                    aparência: Math.floor(Math.random() * 2) + 4,
+                    percepção: Math.floor(Math.random() * 2) + 4,
+                    inteligência: Math.floor(Math.random() * 2) + 4,
+                    raciocínio: Math.floor(Math.random() * 2) + 4
+                };
+                break;
+        }
+        
+        // Gerar habilidades especiais baseadas na raça
+        let specialAbilities = [];
+        switch(race) {
+            case 'vampire':
+                specialAbilities = ['Potência', 'Fortitude', 'Rapidez', 'Dominação', 'Ofuscação'];
+                break;
+            case 'werewolf':
+                specialAbilities = ['Garras', 'Regeneração', 'Sentidos Aguçados', 'Fúria', 'Forma de Lobo'];
+                break;
+            case 'demon':
+                specialAbilities = ['Possessão', 'Fogo Infernal', 'Ilusão', 'Corrupção', 'Telepatia'];
+                break;
+            case 'ghost':
+                specialAbilities = ['Intangibilidade', 'Possessão', 'Telecinese', 'Terror', 'Invisibilidade'];
+                break;
+            case 'human':
+                specialAbilities = ['Determinação', 'Fé', 'Conhecimento Oculto', 'Armas Especiais', 'Aliados'];
+                break;
+        }
+        
+        // Selecionar 2-3 habilidades aleatórias
+        const numAbilities = Math.floor(Math.random() * 2) + 2; // 2 ou 3 habilidades
+        const selectedAbilities = [];
+        for (let i = 0; i < numAbilities; i++) {
+            const randomIndex = Math.floor(Math.random() * specialAbilities.length);
+            selectedAbilities.push(specialAbilities[randomIndex]);
+            specialAbilities.splice(randomIndex, 1); // Remover para não repetir
+        }
+        
+        // Gerar descrição aleatória
+        const descriptions = [
+            `Um ${race === 'vampire' ? 'vampiro' : race === 'werewolf' ? 'lobisomem' : race === 'demon' ? 'demônio' : race === 'ghost' ? 'fantasma' : 'humano'} misterioso com um passado obscuro.`,
+            `Conhecido por sua astúcia e habilidades únicas em combate.`,
+            `Tem uma personalidade enigmática e objetivos desconhecidos.`,
+            `Possui conhecimentos antigos e segredos valiosos.`,
+            `Busca vingança contra aqueles que o prejudicaram no passado.`
+        ];
+        
+        const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+        
+        // Montar o HTML do NPC gerado
+        let npcHTML = `
+            <h5>${randomName}</h5>
+            <p><strong>Raça:</strong> ${race === 'vampire' ? 'Vampiro' : race === 'werewolf' ? 'Lobisomem' : race === 'demon' ? 'Demônio' : race === 'ghost' ? 'Fantasma' : 'Humano'}</p>
+            <p><strong>Clã/Tipo:</strong> ${clan === 'random' ? (race === 'vampire' ? ['Ventrue', 'Toreador', 'Nosferatu', 'Tremere', 'Brujah'][Math.floor(Math.random() * 5)] : 'Variado') : clan}</p>
+            <p><strong>Nível de Poder:</strong> ${powerLevel}</p>
+            <p><strong>Descrição:</strong> ${randomDescription}</p>
+            <p><strong>Atributos:</strong></p>
+            <ul>
+                <li>Força: ${attributes.força}</li>
+                <li>Destreza: ${attributes.destreza}</li>
+                <li>Vigor: ${attributes.vigor}</li>
+                <li>Carisma: ${attributes.carisma}</li>
+                <li>Manipulação: ${attributes.manipulação}</li>
+                <li>Aparência: ${attributes.aparência}</li>
+                <li>Percepção: ${attributes.percepção}</li>
+                <li>Inteligência: ${attributes.inteligência}</li>
+                <li>Raciocínio: ${attributes.raciocínio}</li>
+            </ul>
+            <p><strong>Habilidades Especiais:</strong></p>
+            <ul>
+                ${selectedAbilities.map(ability => `<li>${ability}</li>`).join('')}
+            </ul>
+        `;
+        
+        document.getElementById('npc-details').innerHTML = npcHTML;
+        document.getElementById('save-npc').disabled = false;
+    });
+    
+    // Rolador de Dados
+    document.getElementById('dice-difficulty-check').addEventListener('change', function() {
+        document.getElementById('difficulty-container').style.display = this.checked ? 'block' : 'none';
+    });
+    
+    document.getElementById('roll-dice').addEventListener('click', function() {
+        const diceType = parseInt(document.getElementById('dice-type').value);
+        const diceCount = parseInt(document.getElementById('dice-count').value);
+        const modifier = parseInt(document.getElementById('dice-modifier').value);
+        const useDifficulty = document.getElementById('dice-difficulty-check').checked;
+        const difficulty = useDifficulty ? parseInt(document.getElementById('dice-difficulty').value) : 0;
+        
+        // Validar entradas
+        if (diceCount < 1 || diceCount > 20) {
+            alert('A quantidade de dados deve estar entre 1 e 20.');
+            return;
+        }
+        
+        // Rolar os dados
+        const rolls = [];
+        let total = 0;
+        let successes = 0;
+        
+        for (let i = 0; i < diceCount; i++) {
+            const roll = Math.floor(Math.random() * diceType) + 1;
+            rolls.push(roll);
+            total += roll;
+            
+            if (useDifficulty && roll >= difficulty) {
+                successes++;
+            }
+        }
+        
+        // Aplicar modificador
+        const finalTotal = total + modifier;
+        
+        // Exibir resultados
+        const resultElement = document.getElementById('dice-result');
+        const detailsElement = document.getElementById('dice-details');
+        const historyElement = document.getElementById('dice-history');
+        
+        if (useDifficulty) {
+            resultElement.innerHTML = `<span class="display-4">${successes}</span><br><small>Sucesso${successes !== 1 ? 's' : ''}</small>`;
+        } else {
+            resultElement.innerHTML = `<span class="display-4">${finalTotal}</span>`;
+        }
+        
+        detailsElement.innerHTML = `Rolagens: [${rolls.join(', ')}]${modifier !== 0 ? ` ${modifier >= 0 ? '+' : ''} ${modifier}` : ''}`;
+        
+        // Adicionar ao histórico
+        const now = new Date();
+        const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        
+        const historyEntry = document.createElement('div');
+        historyEntry.className = 'p-1 border-bottom';
+        historyEntry.innerHTML = `
+            <small class="text-muted">${timeString}</small> - 
+            ${diceCount}d${diceType}${modifier !== 0 ? ` ${modifier >= 0 ? '+' : ''} ${modifier}` : ''} = 
+            <strong>${useDifficulty ? `${successes} sucesso${successes !== 1 ? 's' : ''}` : finalTotal}</strong>
+        `;
+        
+        historyElement.prepend(historyEntry);
+        
+        // Limitar o histórico a 10 entradas
+        if (historyElement.children.length > 10) {
+            historyElement.removeChild(historyElement.lastChild);
+        }
+    });
+    
+    // Gerenciador de Iniciativa
+    let initiativeList = [];
+    let currentTurn = -1;
+    
+    document.getElementById('add-initiative').addEventListener('click', function() {
+        const name = document.getElementById('init-name').value.trim();
+        const initValue = parseInt(document.getElementById('init-value').value);
+        const type = document.getElementById('init-type').value;
+        
+        if (!name || isNaN(initValue)) {
+            alert('Por favor, preencha o nome e o valor de iniciativa.');
+            return;
+        }
+        
+        // Adicionar à lista
+        initiativeList.push({
+            name: name,
+            initiative: initValue,
+            type: type
+        });
+        
+        // Limpar campos
+        document.getElementById('init-name').value = '';
+        document.getElementById('init-value').value = '';
+        
+        // Atualizar tabela
+        updateInitiativeTable();
+        
+        // Habilitar botões
+        document.getElementById('next-turn').disabled = false;
+    });
+    
+    document.getElementById('sort-initiative').addEventListener('click', function() {
+        // Ordenar por iniciativa (maior para menor)
+        initiativeList.sort((a, b) => b.initiative - a.initiative);
+        currentTurn = -1; // Resetar o turno atual
+        updateInitiativeTable();
+    });
+    
+    document.getElementById('next-turn').addEventListener('click', function() {
+        if (initiativeList.length === 0) return;
+        
+        // Avançar para o próximo turno
+        currentTurn = (currentTurn + 1) % initiativeList.length;
+        updateInitiativeTable();
+    });
+    
+    document.getElementById('reset-initiative').addEventListener('click', function() {
+        initiativeList = [];
+        currentTurn = -1;
+        updateInitiativeTable();
+        document.getElementById('next-turn').disabled = true;
+    });
+    
+    function updateInitiativeTable() {
+        const tableBody = document.getElementById('initiative-list');
+        tableBody.innerHTML = '';
+        
+        initiativeList.forEach((character, index) => {
+            const row = document.createElement('tr');
+            if (index === currentTurn) {
+                row.className = 'table-success';
+            }
+            
+            row.innerHTML = `
+                <td>${index === currentTurn ? '<i class="fas fa-arrow-right"></i>' : ''}</td>
+                <td>${character.name}</td>
+                <td>${character.initiative}</td>
+                <td>${character.type === 'player' ? 'Jogador' : character.type === 'npc' ? 'NPC' : 'Inimigo'}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger remove-init" data-index="${index}">Remover</button>
+                </td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+        
+        // Adicionar eventos aos botões de remover
+        document.querySelectorAll('.remove-init').forEach(button => {
+            button.addEventListener('click', function() {
+                alert("Clique em 'Gerar NPC' para criar um personagem");
+            });
+        });
+    };
 </script>
 {% endblock %}

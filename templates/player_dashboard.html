@@ -1,0 +1,874 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil - Lilith's Fall{% endblock %}
+
+{% block styles %}
+<style>
+    .player-dashboard-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(30, 30, 30, 0.8);
+        border: 1px solid #444;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .player-dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-header {
+        background: linear-gradient(45deg, #8b0000, #500);
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+    }
+    
+    .card-body {
+        padding: 20px;
+        flex: 1 1 auto;
+    }
+    
+    .character-card {
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        background: rgba(40, 40, 40, 0.8);
+        border: 1px solid #555;
+        transition: transform 0.3s ease;
+    }
+    
+    .character-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .character-img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    
+    .character-info {
+        padding: 15px;
+    }
+    
+    .character-actions {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 15px;
+        background: rgba(20, 20, 20, 0.5);
+    }
+    
+    .profile-section {
+        display: flex;
+        align-items: left;
+        margin-bottom: 20px;
+    }
+    
+    .profile-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #8b0000;
+        margin-right: 20px;
+    }
+    
+    .profile-info {
+        flex-grow: 1;
+        overflow: hidden;
+        padding: 5px;
+        margin-left: 10px;
+    }
+    
+    .profile-info h4 {
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .profile-info p {
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Estilos do Calendário */
+    .event-day {
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #444;
+        background: rgba(40, 40, 40, 0.8);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+        margin-bottom: 2px;
+    }
+    
+    .event-day:hover {
+        background: rgba(139, 0, 0, 0.3);
+        border-color: #8b0000;
+    }
+    
+    .event-day.has-event {
+        background: rgba(139, 0, 0, 0.6);
+        border-color: #8b0000;
+        font-weight: bold;
+    }
+    
+    .event-day.empty {
+        background: transparent;
+        border: none;
+        cursor: default;
+    }
+    
+    .event-day.empty:hover {
+        background: transparent;
+        border: none;
+    }
+    
+    #calendar-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    #events-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .settings-option {
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(50, 50, 50, 0.8);
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .settings-option:hover {
+        background: rgba(80, 0, 0, 0.8);
+    }
+    
+    .activity-container {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .activity-item {
+        padding: 10px;
+        border-bottom: 1px solid #444;
+        transition: background 0.3s ease;
+        margin-bottom: 10px;
+    }
+    
+    /* Estilização da barra de rolagem para navegadores WebKit */
+    .activity-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .activity-container::-webkit-scrollbar-track {
+        background: #333;
+        border-radius: 4px;
+    }
+    
+    .activity-container::-webkit-scrollbar-thumb {
+        background: #8b0000;
+        border-radius: 4px;
+    }
+    
+    /* Estilização da barra de rolagem para Firefox */
+    .activity-container {
+        scrollbar-width: thin;
+        scrollbar-color: #8b0000 #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Coluna do Perfil e Configurações -->
+        <div class="col-md-4">
+            <!-- Perfil do Jogador -->
+            <div class="player-dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-user"></i> Meu Perfil
+                </div>
+                <div class="card-body">
+                    <div class="profile-section">
+                        {% if current_user.user_image %}
+                           <img src="{{ url_for('static', filename=current_user.user_image) }}" class="profile-image" alt="Imagem de Perfil" style="height: 350px; width: 350px;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/user.jpg') }}" class="profile-image" alt="Imagem de Perfil" style="height: 350px; width: 350px;">
+                        {% endif %}
+                        <div class="profile-info">
+                            <h4>{{ current_user.user }}</h4>
+                            <p class="text-muted">{{ current_user.email }}</p>
+                            {% if current_user.is_admin %}
+                                <span class="badge bg-danger">Administrador</span>
+                            {% endif %}
+                            {% if current_user.is_master %}
+                                <span class="badge bg-warning text-dark">Mestre</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-outline-danger w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Configurações da Conta -->
+            <div class="player-dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-cog"></i> Configurações da Conta
+                </div>
+                <div class="card-body">
+                    <a href="#" class="settings-option d-block text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <i class="fas fa-key"></i> Alterar Senha
+                    </a>
+                    <a href="#" class="settings-option d-block text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#notificationSettingsModal">
+                        <i class="fas fa-bell"></i> Configurações de Notificações
+                    </a>
+                    <a href="#" class="settings-option d-block text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        <i class="fas fa-trash-alt"></i> Excluir Conta
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Calendário de Eventos -->
+            <div class="player-dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt"></i> Calendário de Eventos
+                </div>
+                <div class="card-body">
+                    <div id="calendar-container">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <button id="prev-month" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h5 id="current-month" class="mb-0"></h5>
+                            <button id="next-month" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Cabeçalho dos dias da semana -->
+                        <div class="row mb-2">
+                            <div class="col text-center"><small>Dom</small></div>
+                            <div class="col text-center"><small>Seg</small></div>
+                            <div class="col text-center"><small>Ter</small></div>
+                            <div class="col text-center"><small>Qua</small></div>
+                            <div class="col text-center"><small>Qui</small></div>
+                            <div class="col text-center"><small>Sex</small></div>
+                            <div class="col text-center"><small>Sáb</small></div>
+                        </div>
+                        
+                        <!-- Dias do calendário -->
+                        <div id="calendar-days"></div>
+                        
+                        <!-- Lista de eventos do mês -->
+                        <div class="mt-3">
+                            <h6>Eventos do Mês:</h6>
+                            <ul id="events-list" class="list-group list-group-flush">
+                                <li class="list-group-item bg-dark text-light border-danger">Carregando eventos...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botão Sala do Mestre (apenas se for mestre) -->
+            {% if current_user.is_master %}
+            <div class="player-dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-dice-d20"></i> Sala do Mestre
+                </div>
+                <div class="card-body">
+                    <p>Acesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Coluna dos Personagens do Jogador -->
+        <div class="col-md-8">
+            <div class="player-dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-users"></i> Meus Personagens
+                    </div>
+                    <a href="{{ url_for('create_character') }}" class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-plus"></i> Novo Personagem
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if user_characters %}
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="character-container" style="max-height: 400px; overflow-y: auto;">
+                                    <div class="row">
+                                        {% for character in user_characters %}
+                                            <div class="col-md-6 mb-4">
+                                                <div class="character-card" style="height: 350px;">
+                                                    {% if character.image %}
+                                                        <img src="{{ url_for('static', filename=character.image) }}" class="character-img" alt="{{ character.name }}" style="height: 150px;">
+                                                    {% else %}
+                                                        <img src="{{ url_for('static', filename='img/default.jpg') }}" class="character-img" alt="Imagem padrão" style="height: 150px;">
+                                                    {% endif %}
+                                                    <div class="character-info">
+                                                        <h5>{{ character.name }}</h5>
+                                                        <p class="mb-1"><strong>Raça:</strong> {{ character.race }}</p>
+                                                        {% if character.race.lower() == "vampiro" %}
+                                                            <p class="mb-1"><strong>Clã:</strong> {{ character.clan }}</p>
+                                                            <p class="mb-1"><strong>Geração:</strong> {{ character.bloodline }}</p>
+                                                            <p class="mb-1"><strong>Nível:</strong> {{ character.level }}</p>
+                                                        {% endif %}
+                                                        <p class="mb-1"><strong>Descrição:</strong> {{ character.description|truncate(100) }}</p>
+                                                    </div>
+                                                    <div class="character-actions">
+                                                        <a href="{{ url_for('character_detail', character_id=character.id) }}" class="btn btn-sm btn-outline-light">
+                                                            <i class="fas fa-eye"></i> Ver
+                                                        </a>
+                                                        <a href="{{ url_for('edit_character', character_id=character.id) }}" class="btn btn-sm btn-outline-warning">
+                                                            <i class="fas fa-edit"></i> Editar
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-user-slash fa-3x mb-3 text-muted"></i>
+                            <h5>Você ainda não tem personagens</h5>
+                            <p class="text-muted">Crie seu primeiro personagem para começar sua jornada</p>
+                            <a href="{{ url_for('create_character') }}" class="btn btn-danger mt-2">
+                                <i class="fas fa-plus"></i> Criar Personagem
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Aventuras do Jogador -->
+            <div class="player-dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-scroll"></i> Minhas Aventuras
+                </div>
+                <div class="card-body">
+                    {% if user_adventures %}
+                        <div class="activity-container" style="max-height: 400px; overflow-y: auto;">
+                            <div class="row">
+                                {% for adventure in user_adventures|sort(attribute='id', reverse=True) %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="activity-item" style="height: 200px; overflow-y: auto;">
+                                            <h5>{{ adventure.title }}</h5>
+                                            <p><strong>Solicitante:</strong> {{ adventure.requester }}</p>
+                                            <p><strong>Recompensa:</strong> {{ adventure.reward }}</p>
+                                            <p><strong>Status:</strong> <span class="badge {% if adventure.status == 'Disponivel' %}bg-success{% elif adventure.status == 'Em andamento' %}bg-warning{% else %}bg-danger{% endif %}">{{ adventure.status }}</span></p>
+                                            <p><strong>Descrição:</strong> {{ adventure.description|truncate(100) }}</p>
+                                            <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="btn btn-sm btn-outline-danger">Ver Detalhes</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-scroll fa-3x mb-3 text-muted"></i>
+                            <h5>Nenhuma aventura encontrada</h5>
+                            <p class="text-muted">Você ainda não criou ou participou de aventuras</p>
+                            <a href="{{ url_for('create_adventure') }}" class="btn btn-danger mt-2">
+                                <i class="fas fa-plus"></i> Criar Aventura
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Perfil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Editar Perfil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nome de Usuário</label>
+                        <input type="text" class="form-control bg-dark text-white" id="username" name="username" value="{{ current_user.user }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control bg-dark text-white" id="email" name="email" value="{{ current_user.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile_image" class="form-label">Imagem de Perfil</label>
+                        <input type="file" class="form-control bg-dark text-white" id="profile_image" name="profile_image">
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Alterar Senha -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Alterar Senha</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('change_password') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Senha Atual</label>
+                        <input type="password" class="form-control bg-dark text-white" id="current_password" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control bg-dark text-white" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control bg-dark text-white" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">Alterar Senha</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Configurações de Notificações -->
+<div class="modal fade" id="notificationSettingsModal" tabindex="-1" aria-labelledby="notificationSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationSettingsModalLabel">Configurações de Notificações</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('update_notification_settings') }}" method="POST">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="adventure_notifications" name="adventure_notifications" {% if current_user.adventure_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="adventure_notifications">Notificações de Aventuras</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="character_notifications" name="character_notifications" {% if current_user.character_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="character_notifications">Notificações de Personagens</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="system_notifications" name="system_notifications" {% if current_user.system_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="system_notifications">Notificações do Sistema</label>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">Salvar Configurações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Excluir Conta -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Excluir Conta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Atenção! Esta ação não pode ser desfeita.
+                </div>
+                <p>Ao excluir sua conta, todos os seus dados, incluindo personagens e aventuras, serão permanentemente removidos.</p>
+                <form action="{{ url_for('delete_account') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="confirm_delete" class="form-label">Digite "EXCLUIR" para confirmar</label>
+                        <input type="text" class="form-control bg-dark text-white" id="confirm_delete" name="confirm_delete" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control bg-dark text-white" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">Excluir Minha Conta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Criar/Editar Evento -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEventModalLabel">Criar Evento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <input type="hidden" id="eventDate" name="eventDate">
+                    <div class="mb-3">
+                        <label for="eventTitle" class="form-label">Título do Evento</label>
+                        <input type="text" class="form-control bg-dark text-white" id="eventTitle" name="eventTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventDescription" class="form-label">Descrição</label>
+                        <textarea class="form-control bg-dark text-white" id="eventDescription" name="eventDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventTime" class="form-label">Horário (opcional)</label>
+                        <input type="time" class="form-control bg-dark text-white" id="eventTime" name="eventTime">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="saveEventButton">Salvar Evento</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animação para os cards
+    document.querySelectorAll('.player-dashboard-card').forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+    });
+    
+    // Função para animar os elementos quando eles entram na viewport
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }, 100 * Array.from(document.querySelectorAll('.player-dashboard-card')).indexOf(entry.target));
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    // Observar todos os cards
+    document.querySelectorAll('.player-dashboard-card').forEach(card => {
+        observer.observe(card);
+    });
+    
+    // Validação para o formulário de alteração de senha
+    document.querySelector('#changePasswordModal form').addEventListener('submit', function(e) {
+        const newPassword = document.querySelector('#new_password').value;
+        const confirmPassword = document.querySelector('#confirm_password').value;
+        
+        if (newPassword !== confirmPassword) {
+            e.preventDefault();
+            alert('As senhas não coincidem!');
+        }
+    });
+    
+    // Validação para o formulário de exclusão de conta
+    document.querySelector('#deleteAccountModal form').addEventListener('submit', function(e) {
+        const confirmText = document.querySelector('#confirm_delete').value;
+        
+        if (confirmText !== 'EXCLUIR') {
+            e.preventDefault();
+            alert('Por favor, digite "EXCLUIR" para confirmar a exclusão da conta.');
+        }
+    });
+    
+    // Inicializar calendário quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initializeCalendarFunctionality === 'function') {
+            initializeCalendarFunctionality();
+        }
+    });
+</script>
+{% endblock %}
+                </div>
+            </div>
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">
+cesse ferramentas especiais para mestrar suas aventuras</p>
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            <!-- Botão Sala do Mestre -->
+            <div class="player-dashboard-card">

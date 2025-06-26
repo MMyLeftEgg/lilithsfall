@@ -32,6 +32,8 @@
                         <th>ID</th>
                         <th>Nome de usuário</th>
                         <th>Email</th>
+                        <th>Admin</th>
+                        <th>Mestre</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -41,6 +43,20 @@
                         <td>{{ user.id }}</td>
                         <td>{{ user.user }}</td>
                         <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="badge bg-success">Sim</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Não</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.is_master %}
+                            <span class="badge bg-primary">Sim</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Não</span>
+                            {% endif %}
+                        </td>
                         <td>
                             <!-- Botão para abrir o modal de edição -->
                             <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">Editar</button>
@@ -55,8 +71,17 @@
                             <form method="POST" action="{{ url_for('make_admin', user_id=user.id) }}" style="display:inline;">
                                 <button type="submit" class="btn btn-success btn-sm">Tornar Admin</button>
                             </form>
+                            {% endif %}
+                            
+                            <!-- Botões para Tornar/Remover Mestre -->
+                            {% if not user.is_master %}
+                            <form method="POST" action="{{ url_for('make_master', user_id=user.id) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-primary btn-sm">Tornar Mestre</button>
+                            </form>
                             {% else %}
-                            <span class="badge bg-success">Admin</span>
+                            <form method="POST" action="{{ url_for('remove_master', user_id=user.id) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Remover Mestre</button>
+                            </form>
                             {% endif %}
                         </td>
                     </tr>

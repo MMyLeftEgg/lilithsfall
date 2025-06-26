@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Vampiros - Lilith's Fall{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="vampire-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-skull"></i> Vampiros</h2>
+                </div>
+                <div class="card-body">
+                    <p>Explore os clãs e linhagens dos mortos-vivos que habitam o Mundo das Sombras.</p>
+                    
+                    <div class="mt-4">
+                        <h3 class="section-title">Sobre os Vampiros</h3>
+                        <p>Os vampiros são criaturas imortais que se alimentam do sangue dos vivos. Divididos em diversos clãs, cada um com suas próprias características, habilidades e fraquezas, eles formam uma sociedade complexa e hierárquica nas sombras do mundo mortal.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h3 class="section-title">Clãs Principais</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-crown"></i> Ventrue - Os Reis
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-mask"></i> Toreador - Os Artistas
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-book"></i> Tremere - Os Feiticeiros
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-fist-raised"></i> Brujah - Os Rebeldes
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-spider"></i> Nosferatu - Os Deformados
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-moon"></i> Malkavian - Os Lunáticos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h3 class="section-title">Personagens Vampiros Notáveis</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <a href="{{ url_for('dracula') }}" class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-user"></i> Drácula
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="{{ url_for('camilla') }}" class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-female"></i> Camilla
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="{{ url_for('hugo') }}" class="quick-action d-block text-decoration-none text-white">
+                                    <i class="fas fa-male"></i> Hugo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Camilla - Lilith's Fall{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="vampire-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-female"></i> Camilla</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{{ url_for('static', filename='img/Camilla/Camilla_Tremere_1.jpg') }}" alt="Camilla" class="img-fluid rounded mb-3">
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-magic"></i> <strong>Clã:</strong> Tremere
+                            </div>
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-calendar-alt"></i> <strong>Idade:</strong> 250 anos
+                            </div>
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-map-marker-alt"></i> <strong>Origem:</strong> Viena, Áustria
+                            </div>
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-users"></i> <strong>Facção:</strong> Camarilla
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <h3 class="section-title">História</h3>
+                            <p>Camilla nasceu em uma família de nobres austríacos no final do século XVIII. Desde jovem, demonstrou aptidão para as artes ocultas, o que chamou a atenção da Casa Tremere. Foi abraçada durante um ritual de iniciação que saiu terrivelmente errado - ou terrivelmente certo, dependendo da perspectiva.</p>
+                            
+                            <p>Ao longo dos séculos, ascendeu na hierarquia da Casa Tremere, tornando-se uma das mais respeitadas feiticeiras do clã. Atualmente, serve como Regente de uma importante Chantry da Camarilla, onde supervisiona pesquisas arcanas e treina novos aprendizes.</p>
+                            
+                            <h3 class="section-title mt-4">Personalidade</h3>
+                            <p>Camilla é conhecida por sua inteligência afiada e natureza calculista. Ela é metódica em suas ações, raramente agindo por impulso. Embora possa parecer fria e distante à primeira vista, aqueles que ganham sua confiança descobrem uma mentora leal e protetora.</p>
+                            
+                            <p>Sua obsessão pelo conhecimento oculto às vezes a leva a extremos perigosos, e ela já cruzou linhas éticas em nome da pesquisa arcana.</p>
+                            
+                            <h3 class="section-title mt-4">Poderes e Habilidades</h3>
+                            <ul>
+                                <li><strong>Taumaturgia:</strong> Mestra em várias trilhas da magia de sangue Tremere, especialmente a Trilha do Sangue e a Trilha das Chamas.</li>
+                                <li><strong>Auspícios:</strong> Capacidade de perceber o sobrenatural e ler mentes.</li>
+                                <li><strong>Dominação:</strong> Habilidade de controlar mentes mais fracas.</li>
+                                <li><strong>Ocultismo:</strong> Conhecimento enciclopédico sobre magia, rituais e o sobrenatural.</li>
+                                <li><strong>Política:</strong> Compreensão profunda das intrigas da Camarilla.</li>
+                            </ul>
+                            
+                            <h3 class="section-title mt-4">Conexões</h3>
+                            <p>Camilla mantém uma rede de contatos dentro da Camarilla e da Casa Tremere. Tem uma rivalidade de longa data com vários membros do clã Giovanni devido a disputas sobre conhecimento necromântico. É mentora de vários aprendizes Tremere e mantém alianças estratégicas com membros influentes dos clãs Ventrue e Toreador.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

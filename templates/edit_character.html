@@ -1,32 +1,219 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Editar Personagem</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="name" class="form-label">Nome do Personagem</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ character.name }}" required>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-edit"></i> Editar Personagem</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Informações Básicas -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label"><i class="fas fa-user"></i> Nome do Personagem</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ character.name }}" required placeholder="Digite o nome do personagem">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="race" class="form-label"><i class="fas fa-dragon"></i> Raça</label>
+                                    <select class="form-select" id="race" name="race" required onchange="toggleVampireFields()">
+                                        <option value="vampiro" {% if character.race == 'vampiro' %}selected{% endif %}>Vampiro</option>
+                                        <option value="humano" {% if character.race == 'humano' %}selected{% endif %}>Humano</option>
+                                        <option value="demonio" {% if character.race == 'demonio' %}selected{% endif %}>Demônio</option>
+                                        <option value="lobisomen" {% if character.race == 'lobisomen' %}selected{% endif %}>Lobisomen</option>
+                                        <option value="celestial" {% if character.race == 'celestial' %}selected{% endif %}>Celestial</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos específicos para Vampiros -->
+                        <div class="row" id="vampire-fields" style="{% if character.race != 'vampiro' %}display:none;{% endif %}">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="clan" class="form-label"><i class="fas fa-crown"></i> Clã</label>
+                                    <select class="form-select" id="clan" name="clan">
+                                        <option value="Não Afiliado" {% if character.clan == 'Não Afiliado' %}selected{% endif %}>Não Afiliado</option>
+                                        <option value="Assamitas" {% if character.clan == 'Assamitas' %}selected{% endif %}>Assamitas</option>
+                                        <option value="Brujah" {% if character.clan == 'Brujah' %}selected{% endif %}>Brujah</option>
+                                        <option value="Gangrel" {% if character.clan == 'Gangrel' %}selected{% endif %}>Gangrel</option>
+                                        <option value="Giovanni" {% if character.clan == 'Giovanni' %}selected{% endif %}>Giovanni</option>
+                                        <option value="Lasombra" {% if character.clan == 'Lasombra' %}selected{% endif %}>Lasombra</option>
+                                        <option value="Malkavianos" {% if character.clan == 'Malkavianos' %}selected{% endif %}>Malkavianos</option>
+                                        <option value="Nosferatu" {% if character.clan == 'Nosferatu' %}selected{% endif %}>Nosferatu</option>
+                                        <option value="Ravnos" {% if character.clan == 'Ravnos' %}selected{% endif %}>Ravnos</option>
+                                        <option value="Seguidores de set" {% if character.clan == 'Seguidores de set' %}selected{% endif %}>Seguidores de Set</option>
+                                        <option value="Toreador" {% if character.clan == 'Toreador' %}selected{% endif %}>Toreador</option>
+                                        <option value="Tremere" {% if character.clan == 'Tremere' %}selected{% endif %}>Tremere</option>
+                                        <option value="Tzmisce" {% if character.clan == 'Tzmisce' %}selected{% endif %}>Tzimisce</option>
+                                        <option value="Ventrue" {% if character.clan == 'Ventrue' %}selected{% endif %}>Ventrue</option>
+                                        <option value="Caitiff" {% if character.clan == 'Caitiff' %}selected{% endif %}>Caitiff</option>
+                                        <option value="Sangue-ralo" {% if character.clan == 'Sangue-ralo' %}selected{% endif %}>Sangue-ralo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bloodline" class="form-label"><i class="fas fa-dna"></i> Geração</label>
+                                    <select class="form-select" id="bloodline" name="bloodline">
+                                        <option value="1º Geração" {% if character.bloodline == '1º Geração' %}selected{% endif %}>1º Geração</option>
+                                        <option value="2º Geração" {% if character.bloodline == '2º Geração' %}selected{% endif %}>2º Geração</option>
+                                        <option value="3º Geração" {% if character.bloodline == '3º Geração' %}selected{% endif %}>3º Geração</option>
+                                        <option value="4º Geração" {% if character.bloodline == '4º Geração' %}selected{% endif %}>4º Geração</option>
+                                        <option value="5º Geração" {% if character.bloodline == '5º Geração' %}selected{% endif %}>5º Geração</option>
+                                        <option value="6º Geração" {% if character.bloodline == '6º Geração' %}selected{% endif %}>6º Geração</option>
+                                        <option value="7º Geração" {% if character.bloodline == '7º Geração' %}selected{% endif %}>7º Geração</option>
+                                        <option value="8º Geração" {% if character.bloodline == '8º Geração' %}selected{% endif %}>8º Geração</option>
+                                        <option value="9º Geração" {% if character.bloodline == '9º Geração' %}selected{% endif %}>9º Geração</option>
+                                        <option value="10º Geração" {% if character.bloodline == '10º Geração' %}selected{% endif %}>10º Geração</option>
+                                        <option value="11º Geração" {% if character.bloodline == '11º Geração' %}selected{% endif %}>11º Geração</option>
+                                        <option value="12º Geração" {% if character.bloodline == '12º Geração' %}selected{% endif %}>12º Geração</option>
+                                        <option value="13º Geração" {% if character.bloodline == '13º Geração' %}selected{% endif %}>13º Geração</option>
+                                        <option value="14º Geração" {% if character.bloodline == '14º Geração' %}selected{% endif %}>14º Geração</option>
+                                        <option value="15º Geração" {% if character.bloodline == '15º Geração' %}selected{% endif %}>15º Geração</option>
+                                        <option value="sangue-ralo" {% if character.bloodline == 'sangue-ralo' %}selected{% endif %}>Sangue-Ralo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descrição Geral -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label"><i class="fas fa-file-alt"></i> Descrição Geral</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Descreva a aparência física e características gerais do personagem...">{{ character.description or '' }}</textarea>
+                        </div>
+
+                        <!-- Campos Detalhados -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="personalidade" class="form-label"><i class="fas fa-brain"></i> Personalidade</label>
+                                    <textarea class="form-control" id="personalidade" name="personalidade" rows="3" placeholder="Descreva a personalidade, comportamentos, maneirismos e características psicológicas...">{{ character.personalidade or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="poderes_habilidades" class="form-label"><i class="fas fa-magic"></i> Poderes e Habilidades</label>
+                                    <textarea class="form-control" id="poderes_habilidades" name="poderes_habilidades" rows="3" placeholder="Liste os poderes, disciplinas, habilidades especiais e competências do personagem...">{{ character.poderes_habilidades or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="conexoes" class="form-label"><i class="fas fa-users"></i> Conexões</label>
+                                    <textarea class="form-control" id="conexoes" name="conexoes" rows="3" placeholder="Descreva relacionamentos, aliados, inimigos, contatos e vínculos importantes...">{{ character.conexoes or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campo de Imagem -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label"><i class="fas fa-image"></i> Imagem do Personagem</label>
+                            {% if character.image %}
+                                <div class="mb-2">
+                                    <small class="text-muted">Imagem atual:</small>
+                                    <img src="{{ url_for('static', filename=character.image) }}" alt="{{ character.name }}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                </div>
+                            {% endif %}
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                            <div class="form-text">Formatos aceitos: JPG, PNG, GIF (máximo 5MB). Deixe em branco para manter a imagem atual.</div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('character_detail', character_id=character.id) }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Atualizar Personagem
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="race" class="form-label">Raça</label>
-            <select class="form-control" id="race" name="race" required>
-                <option value="vampiro" {% if character.race == 'vampiro' %}selected{% endif %}>Vampiro</option>
-                <option value="humano" {% if character.race == 'humano' %}selected{% endif %}>Humano</option>
-                <option value="demonio" {% if character.race == 'demonio' %}selected{% endif %}>Demônio</option>
-                <option value="lobisomen" {% if character.race == 'lobisomen' %}selected{% endif %}>Lobisomen</option>
-                <option value="celestial" {% if character.race == 'celestial' %}selected{% endif %}>Celestial</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Descrição</label>
-            <textarea class="form-control" id="description" name="description" rows="5">{{ character.description }}</textarea>
-        </div>
-        <div class="mb-3">
-            <label for="image" class="form-label">Imagem do Personagem</label>
-            <input class="form-control" type="file" id="image" name="image">
-        </div>
-        <button type="submit" class="btn btn-primary">Atualizar Personagem</button>
-    </form>
+    </div>
 </div>
+
+<!-- JavaScript para controlar a visibilidade dos campos -->
+<script>
+    function toggleVampireFields() {
+        var race = document.getElementById("race").value;
+        var vampireFields = document.getElementById("vampire-fields");
+
+        // Mostrar campos específicos apenas para Vampiros
+        if (race === "vampiro") {
+            vampireFields.style.display = "block";
+        } else {
+            vampireFields.style.display = "none";
+        }
+    }
+
+    // Executar ao carregar a página para garantir que a seleção inicial esteja correta
+    document.addEventListener("DOMContentLoaded", function() {
+        toggleVampireFields();
+        
+        // Adicionar validação de arquivo
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB
+                    alert('O arquivo deve ter no máximo 5MB');
+                    e.target.value = '';
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+    
+    .shadow {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .img-thumbnail {
+        border-radius: 8px;
+    }
+</style>
 {% endblock %}

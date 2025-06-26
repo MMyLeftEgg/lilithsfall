@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Hugo - Lilith's Fall{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="vampire-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-male"></i> Hugo</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{{ url_for('static', filename='img/Malkavien Homme.jpg') }}" alt="Hugo" class="img-fluid rounded mb-3">
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-moon"></i> <strong>Clã:</strong> Malkavian
+                            </div>
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-calendar-alt"></i> <strong>Idade:</strong> 120 anos
+                            </div>
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-map-marker-alt"></i> <strong>Origem:</strong> Paris, França
+                            </div>
+                            
+                            <div class="quick-action d-block text-decoration-none text-white mb-2">
+                                <i class="fas fa-users"></i> <strong>Facção:</strong> Anarquistas
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <h3 class="section-title">História</h3>
+                            <p>Hugo foi um artista de vanguarda na Paris da virada do século XX. Sua arte experimental e visão única chamaram a atenção de um Malkavian antigo que viu em suas obras a manifestação de uma mente capaz de compreender as verdades ocultas da realidade.</p>
+                            
+                            <p>Após seu Abraço, a loucura característica dos Malkavian intensificou sua criatividade, mas também o tornou errático e imprevisível. Ele vagou pela Europa durante décadas, testemunhando as grandes guerras e revoluções do século XX através de sua perspectiva única e distorcida.</p>
+                            
+                            <p>Eventualmente, Hugo encontrou seu lugar entre os Anarquistas, onde sua visão caótica e revolucionária é valorizada, e suas profecias enigmáticas são ouvidas com respeito.</p>
+                            
+                            <h3 class="section-title mt-4">Personalidade</h3>
+                            <p>Hugo é excêntrico mesmo para os padrões Malkavian. Alterna entre momentos de clareza brilhante e períodos de delírio completo. Sua forma de comunicação é frequentemente metafórica e repleta de referências artísticas e culturais obscuras.</p>
+                            
+                            <p>Apesar de sua instabilidade, Hugo possui um forte senso de justiça e uma compaixão incomum para um vampiro. Ele frequentemente defende os mais fracos e marginalizados, tanto entre mortais quanto entre Cainitas.</p>
+                            
+                            <h3 class="section-title mt-4">Poderes e Habilidades</h3>
+                            <ul>
+                                <li><strong>Demência:</strong> Capacidade de induzir loucura temporária em outros.</li>
+                                <li><strong>Auspícios:</strong> Visões proféticas e percepção sobrenatural.</li>
+                                <li><strong>Ofuscação:</strong> Habilidade de passar despercebido ou tornar-se invisível.</li>
+                                <li><strong>Artes:</strong> Talento extraordinário para todas as formas de expressão artística.</li>
+                                <li><strong>Insight Malkavian:</strong> Compreensão intuitiva de padrões e conexões ocultas.</li>
+                            </ul>
+                            
+                            <h3 class="section-title mt-4">Conexões</h3>
+                            <p>Hugo mantém uma rede de contatos no submundo artístico e entre os Anarquistas. É respeitado por muitos Malkavian que veem nele um oráculo de verdades ocultas. Tem uma relação complexa com vários Toreador, que admiram seu talento artístico mas desconfiam de sua instabilidade. Ocasionalmente serve como mensageiro entre diferentes facções devido à sua natureza aparentemente inofensiva.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

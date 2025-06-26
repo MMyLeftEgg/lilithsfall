@@ -6,6 +6,7 @@
       <div style="border: 3px solid red; padding: 20px; width: 325px; text-align: center; border-radius: 10px;">
         <h2>Login</h2>
         <form method="POST" action="{{ url_for('login') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="mb-3">
             <label for="user" class="form-label">Nome de usuário:</label>
             <input type="text" id="user" name="user" class="form-control" required>
@@ -14,9 +15,12 @@
           <div class="mb-3">
             <label for="password" class="form-label">   Senha:</label>
             <input type="password" id="password" name="password" class="form-control" required>
+            <div class="form-text text-muted mt-1">Nunca compartilhe sua senha com ninguém.</div>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100">Entrar</button>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Entrar</button>
+          </div>
         </form>
         <a href="{{ url_for('forgot_password') }}" target="_blank">Esqueceu sua senha?</a><br>
         {% with messages = get_flashed_messages(with_categories=true) %}

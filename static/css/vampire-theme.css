@@ -1,0 +1,671 @@
+/* Vampire Theme CSS - Melhorias visuais para Lilith's Fall */
+
+/* Variáveis de cores temáticas */
+:root {
+    --blood-red: #8b0000;
+    --dark-red: #5c0000;
+    --black: #000000;
+    --dark-gray: #ee3a3a;
+    --medium-gray: #f15d5d;
+    --light-gray: #f08383;
+    --accent-gold: #b8860b;
+    --text-color: #d0d0d0;
+    --shadow-color: rgba(0, 0, 0, 0.7);
+    --glow-color: rgba(139, 0, 0, 0.7);
+}
+
+/* Estilos globais */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+}
+
+body.vampire-theme {
+    font-family: 'Cinzel', serif;
+    background-color: var(--black);
+    color: var(--text-color);
+    background-image: url('../img/topo.png');
+    background-size: 200px;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+    position: relative;
+    min-height: 100vh;
+    overflow-y: auto !important;
+}
+
+body.vampire-theme::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(20,0,0,0.8) 100%);
+    z-index: -1;
+}
+
+/* Estilos para header e footer */
+header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+footer {
+    padding: 15px 0;
+    text-align: center;
+    background: linear-gradient(to right, var(--black), var(--blood-red), var(--black));
+    border-top: 1px solid var(--dark-red);
+    position: relative;
+    width: 100%;
+}
+
+/* Cabeçalho vampírico */
+.vampire-header {
+    background: linear-gradient(to right, var(--black), var(--blood-red), var(--black));
+    border-bottom: 1px solid var(--dark-red);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+/* Conteúdo principal */
+main {
+    min-height: calc(100vh - 150px); /* Ajuste conforme a altura do header e footer */
+    padding: 20px 0;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Barra de navegação vampírica */
+.vampire-nav {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid var(--blood-red);
+}
+
+.vampire-nav .nav-link {
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.vampire-nav .nav-link:hover {
+    color: var(--blood-red);
+    text-shadow: 0 0 8px var(--glow-color);
+}
+
+/* Estilos para a navegação principal */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-bottom: 1px solid var(--blood-red);
+    position: relative;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    position: relative;
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--blood-red);
+    text-shadow: 0 0 8px var(--glow-color);
+}
+
+/* Sidebar vampírica */
+.vampire-sidebar {
+    background: linear-gradient(to bottom, var(--dark-gray), var(--black));
+    border-right: 1px solid var(--dark-red);
+    box-shadow: 5px 0 15px var(--shadow-color);
+}
+
+.vampire-sidebar .nav-link {
+    color: var(--text-color);
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.vampire-sidebar .nav-link:hover,
+.vampire-sidebar .nav-link.active {
+    background-color: rgba(139, 0, 0, 0.3);
+    border-left: 3px solid var(--blood-red);
+    color: #ffffff;
+}
+
+.vampire-sidebar .nav-link i {
+    color: var(--blood-red);
+}
+
+/* Cards vampíricos */
+.vampire-card {
+    background: linear-gradient(to bottom, rgba(30, 30, 30, 0.9), rgba(10, 10, 10, 0.9));
+    border: 1px solid var(--dark-red);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.vampire-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px var(--shadow-color), 0 0 15px var(--glow-color);
+}
+
+.vampire-card .card-header {
+    background: linear-gradient(45deg, var(--blood-red), var(--dark-red));
+    color: white;
+    border-bottom: 1px solid var(--dark-red);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+.vampire-card .card-body {
+    background-color: rgba(20, 20, 20, 0.8);
+}
+
+/* Efeito de sangue escorrendo */
+.blood-drip {
+    position: relative;
+    overflow: hidden;
+}
+
+.blood-drip::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: var(--blood-red);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+.blood-drip::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    width: 10px;
+    height: 15px;
+    background: var(--blood-red);
+    border-radius: 0 0 5px 5px;
+    transform: translateX(-50%);
+    animation: dripping 4s infinite;
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+@keyframes dripping {
+    0% { height: 0; opacity: 0; }
+    20% { height: 15px; opacity: 1; }
+    40% { height: 30px; top: -5px; }
+    70% { height: 100%; opacity: 1; }
+    100% { height: 100%; opacity: 0; }
+}
+
+/* Botões vampíricos */
+.btn-vampire {
+    background: linear-gradient(to right, var(--dark-red), var(--blood-red), var(--dark-red));
+    color: white;
+    border: 1px solid var(--dark-red);
+    box-shadow: 0 0 10px var(--shadow-color);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
+}
+
+.btn-vampire:hover {
+    background: linear-gradient(to right, var(--blood-red), var(--dark-red), var(--blood-red));
+    box-shadow: 0 0 15px var(--glow-color);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* Efeito de pulso para ícones */
+.pulse-icon {
+    animation: pulse 2s infinite;
+    color: var(--blood-red);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Efeito de fade-in para elementos */
+.fade-in {
+    animation: fadeIn 1.5s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Efeito de névoa para o fundo */
+.mist-bg {
+    position: relative;
+    overflow: hidden;
+}
+
+.mist-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(139,0,0,0.05));
+    animation: mistFlow 15s infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes mistFlow {
+    0% { transform: translateX(-10%) translateY(0); opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { transform: translateX(10%) translateY(5%); opacity: 0.3; }
+}
+
+/* Modo noturno/diurno */
+body.day-mode {
+    background-color: #1a1a1a;
+    background-image: url('../img/topo.png');
+    background-blend-mode: soft-light;
+}
+
+body.day-mode::before {
+    background: linear-gradient(to bottom, rgba(30,30,30,0.9) 0%, rgba(50,30,30,0.8) 100%);
+}
+
+.day-mode .vampire-card {
+    background: linear-gradient(to bottom, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.9));
+}
+
+.day-mode .vampire-sidebar {
+    background: linear-gradient(to bottom, var(--medium-gray), var(--dark-gray));
+}
+
+/* Barra de pesquisa vampírica */
+.search-vampire {
+    background-color: rgba(20, 20, 20, 0.7);
+    border: 1px solid var(--dark-red);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.search-vampire:focus {
+    background-color: rgba(30, 30, 30, 0.9);
+    border-color: var(--blood-red);
+    box-shadow: 0 0 10px var(--glow-color);
+    color: white;
+}
+
+/* Estilo para o sistema de notificações */
+#notification-bell {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--blood-red);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: pulse 2s infinite;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 300px;
+    padding: 0;
+    border: none;
+    box-shadow: 0 0 10px var(--shadow-color);
+    z-index: 1000;
+    background-color: var(--dark-gray);
+    border: 1px solid var(--blood-red);
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.notification-dropdown:before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid var(--dark-red);
+}
+
+.notification-dropdown .card-header {
+    background-color: var(--dark-red);
+    color: white;
+    border-bottom: 1px solid var(--blood-red);
+    padding: 10px 15px;
+    font-size: 16px;
+}
+
+.notification-dropdown .card-body {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.notification-dropdown .card-footer {
+    background-color: var(--dark-gray);
+    border-top: 1px solid var(--blood-red);
+    padding: 8px;
+}
+
+.notification-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.notification-item:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.notification-item h6 {
+    margin: 0 0 5px 0;
+    color: var(--accent-gold);
+}
+
+.notification-item p {
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+.notification-item small {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Breadcrumbs vampíricos */
+.breadcrumb-vampire {
+    background-color: rgba(20, 20, 20, 0.7);
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--dark-red);
+}
+
+.breadcrumb-vampire .breadcrumb-item {
+    color: var(--text-color);
+}
+
+.breadcrumb-vampire .breadcrumb-item.active {
+    color: var(--blood-red);
+}
+
+.breadcrumb-vampire .breadcrumb-item+.breadcrumb-item::before {
+    color: var(--blood-red);
+    content: "\f105";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+
+/* Calendário de eventos */
+.event-calendar {
+    background-color: rgba(20, 20, 20, 0.8);
+    border: 1px solid var(--dark-red);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.event-day {
+    background-color: rgba(30, 30, 30, 0.9);
+    border: 1px solid var(--dark-red);
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.event-day:hover {
+    background-color: rgba(139, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.event-day.has-event {
+    border-left: 3px solid var(--blood-red);
+}
+
+/* Estatísticas personalizadas */
+.stat-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(to bottom right, var(--dark-red), var(--blood-red));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 15px var(--shadow-color);
+}
+
+.stat-circle::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    background-color: var(--dark-gray);
+    z-index: 1;
+}
+
+.stat-value {
+    position: relative;
+    z-index: 2;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+    .vampire-sidebar {
+        width: 60px;
+        transition: all 0.3s ease;
+    }
+    
+    .vampire-sidebar.expanded {
+        width: 250px;
+    }
+    
+    .vampire-sidebar .nav-link span {
+        display: none;
+    }
+    
+    .vampire-sidebar.expanded .nav-link span {
+        display: inline;
+    }
+    
+    .vampire-content {
+        margin-left: 60px;
+        transition: all 0.3s ease;
+    }
+    
+    .vampire-content.sidebar-expanded {
+        margin-left: 250px;
+    }
+}
+
+/* Text wrapping for pre tags in character detail */
+.master-section pre {
+    white-space: pre-wrap; /* CSS3 */
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-gray);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--blood-red);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-red);
+}
+
+/* Estilos para o Sistema de Notificações */
+.notification-dropdown {
+    background: rgba(20, 20, 20, 0.95) !important;
+    border: 1px solid var(--blood-red) !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    backdrop-filter: blur(5px);
+}
+
+.notification-item {
+    padding: 12px;
+    border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+    color: var(--text-color);
+}
+
+.notification-item:hover {
+    background: rgba(139, 0, 0, 0.1);
+}
+
+.notification-item.unread {
+    background: rgba(139, 0, 0, 0.2);
+    border-left: 3px solid var(--blood-red);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-content {
+    margin-bottom: 8px;
+}
+
+.notification-content strong {
+    color: var(--accent-gold);
+    font-size: 14px;
+}
+
+.notification-content p {
+    color: var(--text-color);
+    font-size: 13px;
+    margin: 4px 0;
+    line-height: 1.4;
+}
+
+.notification-content small {
+    color: #999;
+    font-size: 11px;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.notification-actions .btn {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.notification-badge {
+    background: var(--blood-red) !important;
+    color: white !important;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    min-width: 18px;
+    text-align: center;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#notification-bell:hover {
+    color: var(--accent-gold) !important;
+    transition: color 0.3s ease;
+}
+
+/* Responsividade para notificações */
+@media (max-width: 768px) {
+    .notification-dropdown {
+        width: 300px !important;
+        right: -50px !important;
+    }
+    
+    .notification-actions {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .notification-actions .btn {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+}

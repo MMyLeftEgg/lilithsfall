@@ -1,221 +1,378 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Usuário</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-        }
-        .sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #343a40;
-            padding-top: 20px;
-            transition: width 0.3s ease;
-        }
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            font-size: 16px;
-            color: white;
-            display: block;
-            transition: background 0.3s ease;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-            color: #ffffff;
-        }
-        .sidebar a i {
-            margin-right: 10px;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            background-color: #fff;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-        .navbar {
-            margin-left: 250px;
-            background-color: #ffffff;
-            border-bottom: 1px solid #e7e7e7;
-            padding: 15px;
-            transition: margin-left 0.3s ease;
-        }
-        .navbar h3 {
-            font-size: 24px;
-            font-weight: 500;
-        }
-        .btn-logout {
-            margin-right: 20px;
-        }
-        .card {
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .section-title {
-            margin-top: 20px;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-                overflow: hidden;
-                transition: width 0.3s ease;
-            }
-            .sidebar a {
-                text-align: center;
-                padding: 10px;
-            }
-            .sidebar a i {
-                margin: 0;
-            }
-            .sidebar h2 {
-                display: none;
-            }
-            .navbar {
-                margin-left: 60px;
-                transition: margin-left 0.3s ease;
-            }
-            .content {
-                margin-left: 60px;
-                transition: margin-left 0.3s ease;
-            }
-            .btn-logout {
-                margin-right: 0;
-            }
-        }
-        @media (max-width: 576px) {
-            .sidebar, .navbar {
-                display: none;
-            }
-            .content {
-                margin: 0;
-            }
-            .mobile-nav {
-                display: block;
-                padding: 10px;
-                background-color: #343a40;
-                color: white;
-            }
-            .mobile-nav a {
-                color: white;
-                text-decoration: none;
-                font-size: 18px;
-                display: block;
-            }
-            .mobile-nav a:hover {
-                color: #ccc;
-            }
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <!-- Mobile Navigation for Small Screens -->
-    <div class="mobile-nav d-flex justify-content-between align-items-center d-md-none">
-        <span class="navbar-brand mb-0 h3">Painel de Controle</span>
-        <a href="javascript:void(0);" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </a>
-    </div>
+{% block title %}Dashboard - Lilith's Fall{% endblock %}
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2 class="text-center text-light">Sala de controle do mestre</h2>
-        <a href="/"><i class="fas fa-chart-line"></i>Ir para o site</a>
-        <a href="#overview"><i class="fas fa-chart-line"></i> Visão Geral</a>
-        <a href="#settings"><i class="fas fa-cog"></i> Configurações do Site</a>
-        <a href="#users"><i class="fas fa-users"></i> Gerenciar Usuários</a>
-        <a href="#content"><i class="fas fa-file-alt"></i> Gerenciar Conteúdo</a>
-        <a href="#reports"><i class="fas fa-chart-pie"></i> Sala do mestre</a>
-    </div>
+{% block styles %}
+<style>
+    .dashboard-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(30, 30, 30, 0.8);
+        border: 1px solid #444;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-header {
+        background: linear-gradient(45deg, #8b0000, #500);
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+    }
+    
+    .card-body {
+        padding: 20px;
+        flex: 1 1 auto;
+    }
+    
+    .card-body.recent-activity {
+        display: block;
+        height: 300px;
+    }
+    
+    /* Limitar a exibição a 2 itens por padrão */
+    .activity-container {
+        max-height: 600px;
+        overflow-y: auto;
+        overflow-x: auto;
+        padding-right: 15px;
+    }
+    
+    .stats-counter {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #d9534f;
+        animation: countUp 2s ease-out;
+    }
+    
+    .dashboard-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #d9534f;
+        animation: pulse 2s infinite;
+    }
+    
+    .quick-action {
+        transition: all 0.3s ease;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(50, 50, 50, 0.8);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .quick-action:hover {
+        background: rgba(80, 0, 0, 0.8);
+        transform: scale(1.03);
+    }
+    
+    .quick-action i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    /* Estilização da barra de rolagem para navegadores WebKit */
+    .activity-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .activity-container::-webkit-scrollbar-track {
+        background: #333;
+        border-radius: 4px;
+    }
+    
+    .activity-container::-webkit-scrollbar-thumb {
+        background: #8b0000;
+        border-radius: 4px;
+    }
+    
+    /* Estilização da barra de rolagem para Firefox */
+    .activity-container {
+        scrollbar-width: thin;
+        scrollbar-color: #8b0000 #333;
+    }
+    
+    .activity-item {
+        padding: 10px;
+        border-bottom: 1px solid #444;
+        transition: background 0.3s ease;
+        margin-bottom: 10px;
+    }
+    
+    .activity-item:hover {
+        background: rgba(50, 50, 50, 0.5);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .welcome-message {
+        animation: fadeIn 1s ease-out;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .section-title {
+        border-left: 4px solid #8b0000;
+        padding-left: 10px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    
+    .dashboard-container {
+        animation: fadeIn 0.8s ease-out;
+    }
+    
+</style>
+{% endblock %}
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-light d-none d-md-block">
-        <div class="container-fluid">
-            <h3 class="navbar-brand">Painel de Controle</h3>
-            <form class="d-flex">
-                <a href="/logout" class="btn btn-outline-danger btn-logout">Logout</a>
-            </form>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="content">
-        <!-- Visão Geral Section -->
-        <div class="card">
-            <div class="card-body">
-                <h2 id="overview">Visão Geral</h2>
-                <p>Bem-vindo à sua dashboard! Aqui você pode gerenciar todas as áreas do site.</p>
-                <a href="{{ url_for('show_characters') }}" class="btn btn-primary">Ver Personagens</a>
-                <a href="{{ url_for('add_character') }}" class="btn btn-success">Adicionar Personagem</a>
-                <a href="{{ url_for('create_adventure') }}" class="btn btn-primary">Criar aventura</a>
-            </div>
-        </div>
-
-        <!-- Configurações do Site Section -->
-        <div class="card">
-            <div class="card-body">
-                <h2 id="settings">Acervo do mestre</h2>
-                <p>Encontre todo o conteudo necessario para o mestre</p>
-                <a href="{{ url_for('cainitamyth') }}" class="btn btn-primary">Mitologia Cainita</a>
-            </div>
-        </div>
-
-        <!-- Gerenciar Usuários Section -->
-        <div class="card">
-            <div class="card-body">
-                <h2 id="users">Gerenciar Usuários</h2>
-                <p>Aqui você pode adicionar, editar ou excluir usuários do sistema.</p>
-                <a href="{{ url_for('admin_logins') }}" class="btn btn-success">Gerenciar usuários</a>
-            </div>
-        </div>
-
-        <!-- Gerenciar Conteúdo Section -->
-        <div class="card">
-            <div class="card-body">
-                <h2 id="content">Gerenciar Conteúdo</h2>
-                <p>Faça o upload de novas imagens, vídeos ou textos para o seu site.</p>
-                <a href="{{ url_for('admin_characters') }}" class="btn btn-success">Personagens importantes</a>
-                <a href="{{ url_for('create_character') }}" class="btn btn-primary">Criar personagens importantes</a>
-                <a href="{{ url_for('create_clan') }}" class="btn btn-success">Criar Clã</a>
-
-            </div>
-        </div>
-
-        <!-- Relatórios Section -->
-        <div class="card">
-            <div class="card-body">
-                <h2 id="sala_do_mestre">Sala do mestre</h2>
-                <p>Acesse a sala do mestre e inicie sua aventura</p>
-                <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-primary">Sala do mestre</a>
+{% block content %}
+<div class="container dashboard-container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="dashboard-card">
+                <div class="card-body text-center welcome-message">
+                    <h2>Bem-vindo ao Mundo das Sombras, {{ user }}</h2>
+                    <p class="text-muted1">O que você deseja explorar hoje?</p>
+                </div>
             </div>
         </div>
     </div>
+    
+    <div class="row">
+        
+        <!-- Stats Section -->
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i> Estatísticas
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-scroll"></i>
+                            </div>
+                            <div class="stats-counter">{{ adventures|length }}</div>
+                            <div>Aventuras</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats-counter">{{ characters|length }}</div>
+                            <div>Personagens</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-book-dead"></i>
+                            </div>
+                            <div class="stats-counter">{{ user_adventures|length }}</div>
+                            <div>Suas Missões</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i> Ações Rápidas
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('create_adventure') }}" class="quick-action d-block text-decoration-none text-white">
+                        <i class="fas fa-plus-circle"></i> Nova Aventura
+                    </a>
+                    <a href="{{ url_for('create_character') }}" class="quick-action d-block text-decoration-none text-white">
+                        <i class="fas fa-user-plus"></i> Novo Personagem
+                    </a>
 
-    <!-- Bootstrap JS and Font Awesome -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+                    <a href="{{ url_for('campaigns') }}" class="quick-action d-block text-decoration-none text-white">
+                        <i class="fas fa-map-marked"></i> Ver Campanhas
+                    </a>
+                    <a href="{{ url_for('admin_characters') }}" class="quick-action d-block text-decoration-none text-white">
+                        <i class="fas fa-users"></i> Ver Personagens
+                    </a>
+                    {% if current_user.is_admin or current_user.is_master %}
+                    <a href="{{ url_for('admin_clans') }}" class="quick-action d-block text-decoration-none text-white">
+                        <i class="fas fa-crown"></i> Administrar Clans
+                    </a>
+                    {% endif %}
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_logins') }}" class="quick-action d-block text-decoration-none text-white">
+                        <i class="fas fa-user-shield"></i> Administração
+                    </a>
+                    {% endif %}
+                </div>
+                <!-- Botão Sala do Mestre (apenas se for mestre) -->
+            {% if current_user.is_master %}
+            <div class="player-dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-dice-d20"></i> Ferramentas do Mestre
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('sala_do_mestre') }}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-dice-d20"></i> Sala do Mestre
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Adventures -->
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-scroll"></i> Aventuras Recentes
+                </div>
+                <div class="card-body recent-activity">
+                    <div class="activity-container">
+                        <div class="row">
+                            {% set sorted_adventures = adventures|sort(attribute='id', reverse=True) %}
+                            {% for adventure in sorted_adventures[:10] %}
+                            <div class="col-12">
+                                <div class="activity-item d-flex">
+                                    <div class="activity-label">{{ adventure.id }}</div>
+                                    <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                                    <div class="activity-content">
+                                        <a href="{{ url_for('adventure_detail', adventure_id=adventure.id) }}" class="fw-bold text-dark1">
+                                            {{ adventure.title }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Characters Section -->
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-users"></i> Personagens Importantes
+                </div>
+                <div class="card-body recent-activity">
+                    <div class="activity-container">
+                        <div class="row">
+                            {% for character in characters[:10] %}
+                            <div class="col-12">
+                                <div class="activity-item d-flex">
+                                    <div class="activity-label">{{ character.id }}</div>
+                                    <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                                    <div class="activity-content">
+                                        <a href="{{ url_for('character_detail', character_id=character.id) }}" class="fw-bold text-dark1">
+                                            {{ character.name }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- World Information -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-globe"></i> Mundo das Sombras
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <a href="{{ url_for('vampires') }}" class="text-decoration-none text-white">
+                                <div class="dashboard-icon">
+                                    <i class="fas fa-skull"></i>
+                                </div>
+                                <h4>Vampiros</h4>
+                                <p>Explore os clãs e linhagens dos mortos-vivos</p>
+                            </a>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <a href="{{ url_for('demons') }}" class="text-decoration-none text-white">
+                                <div class="dashboard-icon">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <h4>Demônios</h4>
+                                <p>Conheça as entidades infernais</p>
+                            </a>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <a href="{{ url_for('celestials') }}" class="text-decoration-none text-white">
+                                <div class="dashboard-icon">
+                                    <i class="fas fa-sun"></i>
+                                </div>
+                                <h4>Celestiais</h4>
+                                <p>Descubra os seres de luz</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    <script>
-        // Função para abrir e fechar a sidebar em telas menores
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const navbar = document.querySelector('.navbar');
-            sidebar.style.width = sidebar.style.width === '250px' ? '60px' : '250px';
-            content.style.marginLeft = content.style.marginLeft === '250px' ? '60px' : '250px';
-            navbar.style.marginLeft = navbar.style.marginLeft === '250px' ? '60px' : '250px';
-        }
-    </script>
-</body>
-</html>
+{% block scripts %}
+<script>
+    // Add smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+    
+    // Add animation to cards when they come into view
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.dashboard-card').forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        observer.observe(card);
+    });
+</script>
+{% endblock %}

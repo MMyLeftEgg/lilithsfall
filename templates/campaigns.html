@@ -11,7 +11,11 @@
             <div class="card horizontal-card">
                 <div class="row g-0">
                     <div class="col-md-4">
-                        <img src="{{ url_for('static', filename=adventure.image) }}" class="img-fluid rounded-start" alt="Imagem da Aventura" style="height: 250px; width: 350px; object-fit: cover;">
+                        {% if adventure.image %}
+                            <img src="{{ url_for('static', filename=adventure.image) }}" class="img-fluid rounded-start" alt="Imagem da Aventura" style="height: 250px; width: 350px; object-fit: cover;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/default.jpg') }}" class="img-fluid rounded-start" alt="Imagem padrão" style="height: 250px; width: 350px; object-fit: cover;">
+                        {% endif %}
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">

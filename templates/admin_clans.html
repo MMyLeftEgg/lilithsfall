@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Administração de Clans - Lilith's Fall{% endblock %}
+
+{% block styles %}
+<style>
+    .clan-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(30, 30, 30, 0.8);
+        border: 1px solid #444;
+    }
+    
+    .clan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-header {
+        background: linear-gradient(45deg, #8b0000, #500);
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .clan-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #d9534f;
+        animation: pulse 2s infinite;
+    }
+    
+    .clan-action {
+        transition: all 0.3s ease;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(50, 50, 50, 0.8);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .clan-action:hover {
+        background: rgba(80, 0, 0, 0.8);
+        transform: scale(1.03);
+    }
+    
+    .clan-action i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .section-title {
+        border-left: 4px solid #8b0000;
+        padding-left: 10px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="clan-card">
+                <div class="card-header">
+                    <i class="fas fa-crown"></i> Administração de Clans
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Gerencie os clans do mundo das sombras.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Lista de Clans -->
+        <div class="col-md-4">
+            <div class="clan-card">
+                <div class="card-header">
+                    <i class="fas fa-list"></i> Clans Existentes
+                </div>
+                <div class="card-body">
+                    <div class="clan-action d-block text-decoration-none text-white">
+                        <i class="fas fa-skull"></i> Ventrue
+                    </div>
+                    <div class="clan-action d-block text-decoration-none text-white">
+                        <i class="fas fa-moon"></i> Toreador
+                    </div>
+                    <div class="clan-action d-block text-decoration-none text-white">
+                        <i class="fas fa-ghost"></i> Nosferatu
+                    </div>
+                    <div class="clan-action d-block text-decoration-none text-white">
+                        <i class="fas fa-brain"></i> Malkavian
+                    </div>
+                    <div class="clan-action d-block text-decoration-none text-white">
+                        <i class="fas fa-book-dead"></i> Tremere
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulário para Adicionar/Editar Clan -->
+        <div class="col-md-8">
+            <div class="clan-card">
+                <div class="card-header">
+                    <i class="fas fa-edit"></i> Adicionar/Editar Clan
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="clanName" class="form-label">Nome do Clan</label>
+                            <input type="text" class="form-control" id="clanName" placeholder="Ex: Ventrue">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clanDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="clanDescription" rows="3" placeholder="Descreva o clan..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clanDisciplines" class="form-label">Disciplinas</label>
+                            <input type="text" class="form-control" id="clanDisciplines" placeholder="Ex: Dominação, Presença, Fortitude">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clanWeakness" class="form-label">Fraqueza</label>
+                            <input type="text" class="form-control" id="clanWeakness" placeholder="Ex: Seletividade na alimentação">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clanIcon" class="form-label">Ícone (Classe FontAwesome)</label>
+                            <input type="text" class="form-control" id="clanIcon" placeholder="Ex: fas fa-skull">
+                        </div>
+                        <button type="submit" class="btn btn-danger">Salvar Clan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Seção de Linhagens -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="clan-card">
+                <div class="card-header">
+                    <i class="fas fa-sitemap"></i> Linhagens
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Gerencie as linhagens derivadas dos clans principais.</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="clan-action d-block text-decoration-none text-white">
+                                <i class="fas fa-skull"></i> Linhagem Ventrue: Cavaleiros do Sangue
+                            </div>
+                            <div class="clan-action d-block text-decoration-none text-white">
+                                <i class="fas fa-moon"></i> Linhagem Toreador: Artistas da Noite
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="clan-action d-block text-decoration-none text-white">
+                                <i class="fas fa-ghost"></i> Linhagem Nosferatu: Moradores das Sombras
+                            </div>
+                            <div class="clan-action d-block text-decoration-none text-white">
+                                <i class="fas fa-brain"></i> Linhagem Malkavian: Profetas do Caos
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-danger">Adicionar Nova Linhagem</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animação para os cards quando entrarem na visualização
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.clan-card').forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        observer.observe(card);
+    });
+</script>
+{% endblock %}

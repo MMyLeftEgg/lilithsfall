@@ -90,3 +90,28 @@
 </script>
 {% endblock %}
 
+{% if current_user.is_master %}
+<div class="master-fields">
+    <div class="form-group">
+        <label>Personalidade:</label>
+        <textarea class="form-control preserve-formatting" name="personalidade" rows="3">{{ character.personalidade if character }}</textarea>
+    </div>
+    
+    <div class="form-group">
+        <label>Poderes e Habilidades:</label>
+        <textarea class="form-control preserve-formatting" name="poderes_habilidades" rows="5">{{ character.poderes_habilidades if character }}</textarea>
+    </div>
+    
+    <div class="form-group">
+        <label>Conexões:</label>
+        <textarea class="form-control preserve-formatting" name="conexoes" rows="3">{{ character.conexoes if character }}</textarea>
+    </div>
+</div>
+{% endif %}
+
+<div class="form-group">
+    <label>Descrição:</label>
+    <textarea class="form-control preserve-formatting" name="description" rows="8">{{ character.description if character }}</textarea>
+</div>
+{% endblock %}
+

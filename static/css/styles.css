@@ -4,11 +4,17 @@ body {
     margin: 0;
     padding: 0;
     background-color: #000000;
+    overflow-y: auto;
+}
+
+html {
+    overflow-y: auto;
 }
 
 main {
     padding: 20px;
     margin-bottom: 80px; /* Adiciona espaço inferior para evitar sobreposição com o footer */
+    overflow-y: auto;
 }
 
 footer {
@@ -24,7 +30,7 @@ footer {
 /* Navbar */
 header {
     display: flex;
-    align-items: center;
+    align-items: left;
     background: linear-gradient(to left, black, red);
     padding: 10px 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -39,7 +45,7 @@ nav {
 }
 
 .logo {
-    height: 50px;
+    height: 20px;
     width: auto;
 }
 
@@ -530,4 +536,32 @@ nav ul li ul li a:hover {
 .testimonial-carousel .owl-dot.active {
     background: var(--dark);
     border-color: var(--primary);
+}
+.master-fields {
+    border: 1px solid #6c757d;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+}
+
+.preserve-formatting {
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    background-color: #1a1a1a;
+    color: #e9ecef;
+}
+
+.master-section {
+    border-left: 3px solid #8a0303;
+    padding-left: 1rem;
+    margin: 2rem 0;
+}
+
+.testimonial-carousel .owl-dot:hover {
+    background: var(--dark);
+    border-color: var(--primary);
+}
+.text-muted {
+    --bs-text-opacity: 1;
+    color: rgb(243 0 0 / 75%) !important;
 }

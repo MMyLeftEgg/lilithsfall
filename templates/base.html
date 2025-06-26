@@ -3,20 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampire V20 Lilith's Fall</title>
-    <!-- Adicionando o favicon -->
+    <title>Lilith's Fall - {% block title %}{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/topo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="{{ url_for('static', filename='css/vampire-theme.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css') }}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1 0 auto;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav>
-            <a href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='img/VampireV5Logo.webp') }}" alt="Logo" class="logo" style="margin-left: 20px;">
-            </a>
+        <nav style="display: flex; align-items:center;">
+    
             
-            <ul>
+            <ul style="display: flex; margin: 0; padding: 0;">
                 <li><a href="{{ url_for('index') }}">Home</a></li>
                 <li><a href="{{ url_for('characters') }}">Personagens</a>
                     <ul>
@@ -47,22 +72,50 @@
                         
                     </ul>
                 </li>
-                <li><a href="{{ url_for('add_character') }}">Criador de Personagens</a></li>
+               
                 <li><a href="{{ url_for('archive') }}">Arquivo</a></li>
             </ul>
             
             <!-- Adicionando a seção de login/logout e dashboard -->
-            <ul style="display: flex; justify-content: flex-end; list-style: none;">
+            <ul style="display: flex; justify-content: flex-end; list-style: none; align-items: center;">
                 {% if current_user.is_authenticated %}
-                <!-- Exibe o nome do usuário, botão de dashboard e botão de logout -->
+                <!-- Exibe o nome do usuário, ícone de notificações, botão de dashboard e botão de logout -->
                 <li style="margin-right: 20px;">
                     <span style="color: white;">Bem-vindo, {{ current_user.user }}</span>
                 </li>
-                <li style="margin-right: 1px;">
-                    <a href="{{ url_for('dashboard') }}" style="color: green; text-decoration: none; background-color: white; padding: 2px 4px; border-radius: 2px;">Dashboard</a>
+                
+                   
+                </li>
+                {% if current_user.is_admin or current_user.is_master %}
+                <li style="margin-right: 10px;">
+                    <a href="{{ url_for('dashboard') }}" style="color: green; text-decoration: none; background-color: white; padding: 2px 4px; border-radius: 2px;">Dashboard Admin</a>
+                </li>
+                {% endif %}
+                <li style="margin-right: 10px;">
+                    <a href="{{ url_for('player_dashboard') }}" style="color: green; text-decoration: none; background-color: white; padding: 2px 4px; border-radius: 2px;">Meu Perfil</a>
                 </li>
                 <li>
                     <a href="{{ url_for('logout') }}" style="color: white; text-decoration: none; background-color: red; padding: 2px 4px; border-radius: 2px;">Logout</a>
+                </li>
+                <li style="margin-right: 15px; position: relative;">
+                    <a href="#" id="notification-bell" style="color: white; font-size: 18px; position: relative;">
+                        <i class="fas fa-bell"></i>
+                        <span id="notification-count" class="notification-badge" style="display: none; position: absolute; top: -8px; right: -8px; background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; min-width: 18px; text-align: center;">0</span>
+                    </a>
+                    <!-- Dropdown de notificações (inicialmente oculto) -->
+                    <div id="notification-dropdown" class="notification-dropdown vampire-card" style="display: none; position: absolute; top: 100%; right: 0; width: 350px; max-height: 400px; overflow-y: auto; z-index: 1000; background: rgba(20, 20, 20, 0.95); border: 1px solid #8b0000; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                        <div class="card-header" style="background: rgba(139, 0, 0, 0.8); color: white; padding: 10px; border-bottom: 1px solid #8b0000;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><i class="fas fa-bell"></i> Notificações</span>
+                                <button id="mark-all-read" class="btn btn-sm btn-outline-light" style="font-size: 12px;">Marcar todas como lidas</button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 0; max-height: 300px; overflow-y: auto;">
+                            <div id="notifications-list">
+                                <!-- As notificações serão carregadas dinamicamente aqui -->
+                            </div>
+                        </div>
+                    </div>
                 </li>
                 {% else %}
                 <!-- Exibe o botão de login se o usuário não estiver logado -->
@@ -79,6 +132,16 @@
     <footer>
         <p>&copy; 2024 Vampire V20 Lilith's Fall - Todos os direitos reservados.</p>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='lib/chart/chart.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/easing/easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/waypoints/waypoints.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/tempusdominus/js/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vampire-theme.js') }}"></script>
 </body>
 </html>
