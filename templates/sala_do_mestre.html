@@ -222,6 +222,93 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dice-animation-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px; /* Adjust as needed */
+        margin-top: 20px;
+    }
+
+    .dice-animation {
+        font-size: 4em; /* Size of the dice */
+        animation: roll 1s ease-out forwards;
+        display: inline-block;
+        transform-style: preserve-3d;
+        transform-origin: 50% 50%;
+    }
+
+    @keyframes roll {
+        0% {
+            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            opacity: 0;
+        }
+        20% {
+            opacity: 1;
+        }
+        100% {
+            transform: rotateX(720deg) rotateY(720deg) rotateZ(720deg);
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rollDiceButton = document.getElementById('roll-dice');
+        const diceTypeInput = document.getElementById('dice-type');
+        const diceCountInput = document.getElementById('dice-count');
+        const diceModifierInput = document.getElementById('dice-modifier');
+        const diceResultDiv = document.getElementById('dice-result');
+
+        if (rollDiceButton) {
+            rollDiceButton.addEventListener('click', function() {
+                const diceType = parseInt(diceTypeInput.value);
+                const diceCount = parseInt(diceCountInput.value);
+                const diceModifier = parseInt(diceModifierInput.value);
+
+                if (isNaN(diceType) || isNaN(diceCount) || isNaN(diceModifier)) {
+                    diceResultDiv.innerHTML = '<p class="text-danger">Por favor, insira valores numéricos válidos.</p>';
+                    return;
+                }
+
+                let totalRoll = 0;
+                let rolls = [];
+                const animationContainer = document.createElement('div');
+                animationContainer.className = 'dice-animation-container';
+                diceResultDiv.innerHTML = ''; // Clear previous results
+                diceResultDiv.appendChild(animationContainer);
+
+                for (let i = 0; i < diceCount; i++) {
+                    const roll = Math.floor(Math.random() * diceType) + 1;
+                    rolls.push(roll);
+                    totalRoll += roll;
+
+                    const diceSpan = document.createElement('span');
+                    diceSpan.className = 'dice-animation me-2';
+                    diceSpan.textContent = roll;
+                    animationContainer.appendChild(diceSpan);
+                }
+
+                totalRoll += diceModifier;
+
+                setTimeout(() => {
+                    diceResultDiv.innerHTML = `
+                        <p>Rolagens: ${rolls.join(', ')}</p>
+                        <p>Modificador: ${diceModifier}</p>
+                        <h4>Resultado Total: ${totalRoll}</h4>
+                    `;
+                }, 1000); // Wait for animation to finish
+            });
+        }
+    });
+</script>
                 
                 <!-- Aba do Gerenciador de Iniciativa -->
                 <div class="tab-pane fade" id="initiative" role="tabpanel" aria-labelledby="initiative-tab">
